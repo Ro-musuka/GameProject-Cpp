@@ -9,7 +9,7 @@
 
 Actor::Actor(Game *game)
     : mGame(game),
-      mPosition(glm::vec3(1.0f)),
+      mPosition(glm::vec3(.0f)),
       mRotation(glm::quat()),
       mScale(glm::vec3(1.0f)),
       mWorldTransform(1.0f)
@@ -20,6 +20,11 @@ Actor::Actor(Game *game)
 Actor::~Actor()
 {
     mGame->RemoveActor(this);
+
+    while (!mComponents.empty())
+    {
+        delete mComponents.back();
+    }
 }
 
 void Actor::Update(float deltaTime)
