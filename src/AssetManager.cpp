@@ -42,10 +42,11 @@ Texture *AssetManager::GetTexture(const std::string &name)
 {
     // 既に読み込まれているか確認
     auto iter = textures.find(name);
-    if (iter != textures.end())
+    if (iter == textures.end())
     {
-        return iter->second;
+        return nullptr;
     }
+    return iter->second;
 
     // // 新しく読み込む
     // Texture *tex = new Texture();
@@ -62,19 +63,18 @@ Texture *AssetManager::GetTexture(const std::string &name)
     // return tex;
 }
 
-std::vector<Animation *> &AssetManager::GetAnimations(const std::string &name)
+std::vector<Animation *> *AssetManager::GetAnimations(const std::string &name)
 {
     auto iter = animations.find(name);
     if (iter == animations.end())
     {
-        std::vector<Animation *> anims;
-        return anims;
+        return nullptr;
     }
 
-    return iter->second;
+    return &(iter->second);
 }
 
-void AssetManager::SetAnimations(const std::string &name, std::vector<Animation *> &anims)
+void AssetManager::SetAnimations(const std::string &name, const std::vector<Animation *> &anims)
 {
     animations[name] = anims;
 }

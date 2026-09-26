@@ -22,8 +22,8 @@ public:
     Texture *GetTexture(const std::string &name);
     void SetTexture(const std::string &name, Texture *tex);
 
-    std::vector<Animation *> &GetAnimations(const std::string &name);
-    void SetAnimations(const std::string &name, std::vector<Animation *> &anims);
+    std::vector<Animation *> *GetAnimations(const std::string &name);
+    void SetAnimations(const std::string &name, const std::vector<Animation *> &anims);
 
     Skeleton GetSkeleton(const std::string &name) const;
     void SetSkeleton(const std::string &name, Skeleton skeleton);
