@@ -32,7 +32,8 @@ public:
     void SetView(const glm::mat4 &view) { mView = view; }
 
 private:
-    void AttachModel(const std::string &name, Actor *actor);
+    bool LoadModel(const std::string &filName, const std::string &modelName);
+    void AttachModelComp(Actor *actor, const std::string &modelName);
 
     float mScreenWidth;
     float mScreenHeight;

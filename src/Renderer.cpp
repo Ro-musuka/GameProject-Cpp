@@ -88,20 +88,13 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
 
     // モデルのロード
     Actor *actor = new Actor(GetGame());
-
-    actor = new Actor(GetGame());
     actor->SetPosition(glm::vec3(.0f, .0f, .0f));
-
-    ModelLoader loader("../assets/models/BaseMan.glb");
-    if (!loader.IsValid())
+    if (!LoadModel("../assets/models/BaseMan.glb", "anim"))
     {
-        SDL_Log("BaseMan.glbの読み込みに失敗しました");
         return false;
     }
-    AnimationPlayer animPlayer(loader.SkeletonLoader(), loader.AnimationsLoader());
-    AnimMeshComponent *comp = new AnimMeshComponent(actor, loader.AnimMeshLoader(), animPlayer);
-    comp->Play("Walking");
-    mAnimMeshComps.emplace_back(comp);
+    AttachModelComp(actor, "anim");
+    mAnimMeshComps.back()->Play("Walking");
 
     // mTerrain = new Terrain(GetGame());
     // mTerrain->Load(256, 256);
@@ -135,20 +128,48 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
     return true;
 }
 
-void Renderer::AttachModel(const std::string &name, Actor *actor)
+bool Renderer::LoadModel(const std::string &fileName, const std::string &modelName)
 {
-    Mesh *mesh = mAssetManager.GetMesh(name);
-    if (mesh)
+    ModelLoader loader(fileName);
+    if (!loader.IsValid())
     {
-        Component *comp = new MeshComponent(actor, mesh);
-        mMeshComps.emplace_back(comp);
+        SDL_Log("%sの読み込みに失敗しました", fileName.c_str());
+        return false;
+    }
+
+    if (loader.IsAnimation())
+    {
+        mAssetManager.SetAnimMesh(modelName, loader.AnimMeshLoader());
+        mAssetManager.SetSkeleton(modelName, loader.SkeletonLoader());
+        mAssetManager.SetAnimations(modelName, loader.AnimationsLoader());
+    }
+    else
+    {
+        mAssetManager.SetMesh(modelName, loader.MeshLoader());
+    }
+
+    return true;
+}
+
+void Renderer::AttachModelComp(Actor *actor, const std::string &modelName)
+{
+    Mesh *mesh = mAssetManager.GetMesh(modelName);
+    if (mesh != nullptr)
+    {
+        MeshComponent *mc = new MeshComponent(actor, mesh);
+        mMeshComps.emplace_back(mc);
         return;
     }
 
-    AnimMesh *animMesh = mAssetManager.GetAnimMesh(name);
-    AnimationPlayer animPlayer(mAssetManager.GetSkeleton(name), mAssetManager.GetAnimations(name));
-    Component *comp = new AnimMeshComponent(actor, animMesh, animPlayer);
-    mMeshComps.emplace_back(comp);
+    AnimMesh *amesh = mAssetManager.GetAnimMesh(modelName);
+    if (amesh != nullptr)
+    {
+        AnimationPlayer animPlayer(mAssetManager.GetSkeleton(modelName), *mAssetManager.GetAnimations(modelName));
+        AnimMeshComponent *amc = new AnimMeshComponent(actor, amesh, animPlayer);
+        mAnimMeshComps.emplace_back(amc);
+    }
+
+    SDL_Log("%sがAssetManagerに登録されていません。", modelName.c_str());
 }
 
 void Renderer::Draw()
