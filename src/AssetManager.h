@@ -4,15 +4,19 @@
 #include <vector>
 #include <unordered_map>
 
+#include "Animation/Skeleton.h"
+
 class Mesh;
 class AnimMesh;
 class Texture;
 struct Animation;
 class Skeleton;
-
+class Shader;
 class AssetManager
 {
 public:
+    void Unload();
+
     Mesh *GetMesh(const std::string &name) const;
     void SetMesh(const std::string &name, Mesh *mesh);
 
@@ -28,6 +32,9 @@ public:
     Skeleton GetSkeleton(const std::string &name) const;
     void SetSkeleton(const std::string &name, Skeleton skeleton);
 
+    Shader &GetShader(const std::string &name);
+    void SetShader(const std::string &name, Shader &shader);
+
 private:
     std::unordered_map<std::string, Mesh *> meshes;
     std::unordered_map<std::string, AnimMesh *> animMeshes;
@@ -35,4 +42,6 @@ private:
 
     std::unordered_map<std::string, std::vector<Animation *>> animations;
     std::unordered_map<std::string, Skeleton> skeletons;
+
+    std::unordered_map<std::string, Shader> shaders;
 };

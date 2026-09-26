@@ -2,9 +2,45 @@
 
 #include "Graphics/Mesh.h"
 #include "Graphics/AnimMesh.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
 
 #include "Animation/Animation.h"
-#include "Animation/Skeleton.h"
+
+void AssetManager::Unload()
+{
+    for (auto &[name, m] : meshes)
+    {
+        delete m;
+    }
+
+    for (auto &[name, am] : animMeshes)
+    {
+        delete am;
+    }
+
+    for (auto &[name, tex] : textures)
+    {
+        tex->Unload();
+        delete tex;
+    }
+
+    for (auto &[name, anims] : animations)
+    {
+        for (auto &a : anims)
+        {
+            delete a;
+        }
+    }
+
+    skeletons.clear();
+
+    for (auto &[name, shader] : shaders)
+    {
+        shader.Unload();
+    }
+    shaders.clear();
+}
 
 Mesh *AssetManager::GetMesh(const std::string &name) const
 {
@@ -81,12 +117,20 @@ void AssetManager::SetAnimations(const std::string &name, const std::vector<Anim
 
 Skeleton AssetManager::GetSkeleton(const std::string &name) const
 {
-    auto iter = skeletons.find(name);
-    // エラー出ても知るか。
-    return iter->second;
+    return skeletons.find(name)->second;
 }
 
 void AssetManager::SetSkeleton(const std::string &name, Skeleton skeleton)
 {
     skeletons[name] = skeleton;
+}
+
+Shader &AssetManager::GetShader(const std::string &name)
+{
+    return shaders.find(name)->second;
+}
+
+void AssetManager::SetShader(const std::string &name, Shader &shader)
+{
+    shaders[name] = shader;
 }
