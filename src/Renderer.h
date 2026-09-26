@@ -20,7 +20,6 @@ class Renderer
 {
 public:
     Renderer(Game *game);
-    ~Renderer();
 
     bool Initialize(float screenWidth, float screenHeight);
     void Shutdown();
@@ -38,17 +37,17 @@ private:
     float mScreenWidth;
     float mScreenHeight;
 
+    // ワールド座標への変換行列
     glm::mat4 mView;
     glm::mat4 mProjection;
     glm::mat4 mWorldTransform;
 
     glm::vec3 mTarget;
 
+    // 光源
     glm::vec3 mLightDir;
     glm::vec3 mObjectColor;
     glm::vec3 mLightColor;
-
-    std::unordered_map<std::string, Shader> mShaderMap;
 
     std::vector<MeshComponent *> mMeshComps;
     std::vector<AnimMeshComponent *> mAnimMeshComps;

@@ -64,8 +64,8 @@ void Game::Shutdown()
 
 void Game::ProcessInput()
 {
+    // イベントをポーリング
     SDL_Event e;
-
     while (SDL_PollEvent(&e))
     {
         if (e.type == SDL_EVENT_QUIT)
@@ -75,6 +75,7 @@ void Game::ProcessInput()
         }
     }
 
+    // キー入力処理
     const bool *keystate = SDL_GetKeyboardState(NULL);
     if (keystate[SDL_SCANCODE_ESCAPE])
     {
@@ -89,7 +90,8 @@ void Game::ProcessInput()
 
 void Game::GameUpdate()
 {
-    while (SDL_GetTicks() <= mTicksCount + 15)
+    // 60fps
+    while (SDL_GetTicks() < mTicksCount + 16.6)
     {
     }
 
@@ -106,6 +108,11 @@ void Game::GameUpdate()
     }
 }
 
+void Game::GenerateOutput()
+{
+    mRenderer->Draw();
+}
+
 bool Game::LoadData()
 {
     mCamera = new Camera(this);
@@ -115,11 +122,6 @@ bool Game::LoadData()
 void Game::UnloadData()
 {
     mRenderer->UnloadData();
-}
-
-void Game::GenerateOutput()
-{
-    mRenderer->Draw();
 }
 
 void Game::AddActor(Actor *actor)

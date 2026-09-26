@@ -9,11 +9,14 @@ Skeleton::~Skeleton()
 
 void Skeleton::Update()
 {
-    // アニメーションによる移動をなくす
-    mBones.begin()[mRootID].localTransform = glm::mat4(1.0f);
+    // アニメーションによる、モデルの移動をなくす
+    mBones[mRootID].localTransform = glm::mat4(1.0f);
 
+    // 親ボーンのグローバル座標から、子ボーンの座標を決定する
+    // 最初はルートボーンから計算
     UpdateBone(mBones[mRootID]);
 
+    // ボーン行列を作成
     for (const Bone &bone : mBones)
     {
         mBoneMatrices[bone.ID] = bone.globalTransform * bone.offset;

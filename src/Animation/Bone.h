@@ -9,6 +9,7 @@ struct Bone
     std::string name;
 
     glm::mat4 offset{1.0f};
+    // localTransformの初期値
     glm::mat4 bindLocalTransform{1.0f};
     glm::mat4 localTransform{1.0f};
     glm::mat4 globalTransform{1.0f};

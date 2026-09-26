@@ -61,11 +61,13 @@ void AnimationPlayer::Update(float deltaTime)
         }
     }
 
+    // ローカル変換座標を前ポーンリセット
     mSkeleton.ResetlocalTransform();
     for (auto &[name, bone] : mSkeleton.GetBoneMap())
     {
         UpdateBone(name);
     }
+    // オフセットや親ボーンによる変換などで更新
     mSkeleton.Update();
 }
 

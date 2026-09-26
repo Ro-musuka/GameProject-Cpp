@@ -33,10 +33,6 @@ Renderer::Renderer(Game *game)
 {
 }
 
-Renderer::~Renderer()
-{
-}
-
 bool Renderer::Initialize(float screenWidth, float screenHeight)
 {
     mScreenWidth = screenWidth;
@@ -88,12 +84,14 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
 
     // モデルのロード
     Actor *actor = new Actor(GetGame());
-    actor->SetPosition(glm::vec3(.0f, .0f, .0f));
+    // 3dモデルのロード
     if (!LoadModel("../assets/models/BaseMan.glb", "anim"))
     {
         return false;
     }
+    // モデルの肉付け
     AttachModelComp(actor, "anim");
+    // 再生するアニメの設定
     mAnimMeshComps.back()->Play("Walking");
 
     // mTerrain = new Terrain(GetGame());
@@ -108,7 +106,7 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
         SDL_Log("shaderの読み込みに失敗しました");
         return false;
     }
-    mShaderMap["base"] = shader;
+    mAssetManager.SetShader("base", shader);
 
     Shader animationShader;
     if (!animationShader.Load("../assets/shaders/Skinned.vert", "../assets/shaders/Basic.frag"))
@@ -116,16 +114,62 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
         SDL_Log("shaderの読み込みに失敗しました");
         return false;
     }
-    mShaderMap["anim"] = animationShader;
+    mAssetManager.SetShader("anim", animationShader);
 
     // 視野角, アスペクト比, 近クリップ面, 遠クリップ面
     mProjection = glm::perspective(glm::radians(45.0f), mScreenWidth / mScreenHeight, 0.1f, 100.0f);
     mWorldTransform = glm::mat4(1.0f);
 
+    // 光源色
     mObjectColor = glm::vec3(0.8f);
     mLightColor = glm::vec3(1.0f);
 
     return true;
+}
+
+void Renderer::Draw()
+{
+    // 前回の画面をクリア
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+
+    mView = glm::lookAt(mGame->GetCamera()->GetPosition(), mTarget, Common::UnitY);
+    mLightDir = -glm::normalize(mGame->GetCamera()->GetPosition());
+
+    // 通常モデルの描画
+    Shader &shader = mAssetManager.GetShader("base");
+    shader.SetActive();
+    shader.SetMatrixUniform("uView", mView);
+    shader.SetMatrixUniform("uProjection", mProjection);
+    shader.SetVectorUniform("lightDir", mLightDir);
+    shader.SetVectorUniform("objectColor", mObjectColor);
+    shader.SetVectorUniform("lightColor", mLightColor);
+    for (auto &model : mMeshComps)
+    {
+        model->Draw(shader);
+    }
+    // mTerrain->ComputeWorldTransform();
+    // shader.SetMatrixUniform("uWorldTransform", mTerrain->GetWorldTransform());
+    // mTerrain->GetMesh()->Draw();
+
+    // アニメーションモデルの描画
+    Shader &animShader = mAssetManager.GetShader("anim");
+    animShader.SetActive();
+    animShader.SetMatrixUniform("uView", mView);
+    animShader.SetMatrixUniform("uProjection", mProjection);
+    animShader.SetVectorUniform("lightDir", mLightDir);
+    animShader.SetVectorUniform("objectColor", mObjectColor);
+    animShader.SetVectorUniform("lightColor", mLightColor);
+    for (auto &model : mAnimMeshComps)
+    {
+        model->Draw(&animShader);
+    }
+
+    // 画面バッファの交換
+    SDL_GL_SwapWindow(mWindow);
 }
 
 bool Renderer::LoadModel(const std::string &fileName, const std::string &modelName)
@@ -167,71 +211,15 @@ void Renderer::AttachModelComp(Actor *actor, const std::string &modelName)
         AnimationPlayer animPlayer(mAssetManager.GetSkeleton(modelName), *mAssetManager.GetAnimations(modelName));
         AnimMeshComponent *amc = new AnimMeshComponent(actor, amesh, animPlayer);
         mAnimMeshComps.emplace_back(amc);
+        return;
     }
 
     SDL_Log("%sがAssetManagerに登録されていません。", modelName.c_str());
 }
 
-void Renderer::Draw()
-{
-    // 前回の画面をクリア
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
-    mView = glm::lookAt(mGame->GetCamera()->GetPosition(), mTarget, Common::UnitY);
-    mLightDir = -glm::normalize(mGame->GetCamera()->GetPosition());
-
-    Shader &shader = mShaderMap["base"];
-    shader.SetActive();
-    shader.SetMatrixUniform("uView", mView);
-    shader.SetMatrixUniform("uProjection", mProjection);
-    shader.SetVectorUniform("lightDir", mLightDir);
-    shader.SetVectorUniform("objectColor", mObjectColor);
-    shader.SetVectorUniform("lightColor", mLightColor);
-    for (auto &model : mMeshComps)
-    {
-        model->Draw(shader);
-    }
-    // mTerrain->ComputeWorldTransform();
-    // shader.SetMatrixUniform("uWorldTransform", mTerrain->GetWorldTransform());
-    // mTerrain->GetMesh()->Draw();
-
-    Shader &animShader = mShaderMap["anim"];
-    animShader.SetActive();
-    animShader.SetMatrixUniform("uView", mView);
-    animShader.SetMatrixUniform("uProjection", mProjection);
-    animShader.SetVectorUniform("lightDir", mLightDir);
-    animShader.SetVectorUniform("objectColor", mObjectColor);
-    animShader.SetVectorUniform("lightColor", mLightColor);
-    for (auto &model : mAnimMeshComps)
-    {
-        model->Draw(&animShader);
-    }
-
-    // 画面バッファの交換
-    SDL_GL_SwapWindow(mWindow);
-}
-
 void Renderer::UnloadData()
 {
-    for (auto &[name, shader] : mShaderMap)
-    {
-        shader.Unload();
-    }
-    mShaderMap.clear();
-
-    for (auto &model : mMeshComps)
-    {
-        delete model;
-    }
-
-    for (auto &model : mAnimMeshComps)
-    {
-        delete model;
-    }
+    mAssetManager.Unload();
 }
 
 void Renderer::Shutdown()

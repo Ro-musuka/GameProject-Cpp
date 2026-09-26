@@ -11,6 +11,7 @@
 
 ModelLoader::ModelLoader(const std::string &fileName)
 {
+    // 3dファイルを読み込み
     mScene = mImporter.ReadFile(fileName,
                                 aiProcess_Triangulate |
                                     aiProcess_JoinIdenticalVertices |
@@ -150,6 +151,7 @@ Skeleton ModelLoader::SkeletonLoader()
 
     BuildBoneHierarchy(&skeleton, mScene->mRootNode);
 
+    // スケルトンのボーンの数を設定
     skeleton.ResizeBoneMatrices();
 
     return skeleton;
@@ -159,8 +161,8 @@ void ModelLoader::BuildBoneHierarchy(Skeleton *skeleton, aiNode *node, int paren
 {
     // 子ボーン
     Bone *bone = skeleton->FindBone(node->mName.C_Str());
-    // bone != nullptr
-    if (bone)
+
+    if (bone != nullptr)
     {
         bone->bindLocalTransform = ToGlm(node->mTransformation);
         bone->localTransform = bone->bindLocalTransform;

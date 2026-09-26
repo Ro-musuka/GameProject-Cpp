@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+// 時間ごとの位置、回転、拡大
 struct KeyPosition
 {
     float time;
@@ -25,6 +26,7 @@ struct KeyScale
     glm::vec3 value;
 };
 
+// それらの配列を持つ、ボーンごとのアニメーション
 struct BoneAnimation
 {
     std::vector<KeyPosition> positions;
@@ -32,11 +34,14 @@ struct BoneAnimation
     std::vector<KeyScale> scales;
 };
 
+// 一つのアニメーションができる
 struct Animation
 {
     std::string name;
     float duration = 0.0f;
+    // 再生速度
     float ticksPerSecond = 1.0f;
 
+    // ボーンの名前ごとの、アニメーション
     std::unordered_map<std::string, BoneAnimation> channels;
 };

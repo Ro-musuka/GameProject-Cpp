@@ -51,10 +51,12 @@ public:
 
 private:
     std::vector<class Component *> mComponents;
+
     glm::mat4 mWorldTransform;
     glm::vec3 mPosition;
     glm::quat mRotation;
     glm::vec3 mScale;
+
     bool mRecomputeWorldTransform;
 
     class Game *mGame;
