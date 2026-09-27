@@ -10,7 +10,7 @@ Skeleton::~Skeleton()
 void Skeleton::Update()
 {
     // アニメーションによる、モデルの移動をなくす
-    mBones[mRootID].localTransform = glm::mat4(1.0f);
+    mBones[mRootID].localTransform = mBones[mRootID].bindLocalTransform;
 
     // 親ボーンのグローバル座標から、子ボーンの座標を決定する
     // 最初はルートボーンから計算

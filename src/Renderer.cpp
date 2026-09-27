@@ -93,6 +93,7 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
     AttachModelComp(actor, "anim");
     // 再生するアニメの設定
     mAnimMeshComps.back()->Play("Walking");
+    actor->SetRotation(glm::rotate(glm::mat4(1.f), glm::radians(90.f), Common::UnitX));
 
     // mTerrain = new Terrain(GetGame());
     // mTerrain->Load(256, 256);
