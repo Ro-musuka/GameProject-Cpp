@@ -1,7 +1,9 @@
 #pragma onces
+
+#include <vector>
+
 #include <SDL3/SDL.h>
 #include <glm/glm.hpp>
-#include <vector>
 
 class Renderer;
 class Actor;
@@ -19,8 +21,6 @@ public:
     void AddActor(Actor *actor);
     void RemoveActor(Actor *actor);
 
-    Camera *GetCamera() const { return mCamera; }
-
 private:
     void ProcessInput();
     void GameUpdate();
@@ -31,7 +31,6 @@ private:
     Renderer *mRenderer;
 
     std::vector<Actor *> mActor;
-    Camera *mCamera;
 
     bool mIsRunning;
     Uint32 mTicksCount;

@@ -15,6 +15,7 @@ class Shader;
 class Texture;
 class MeshComponent;
 class AnimMeshComponent;
+class FollowCameraComponent;
 
 class Renderer
 {
@@ -49,6 +50,7 @@ private:
     glm::vec3 mObjectColor;
     glm::vec3 mLightColor;
 
+    FollowCameraComponent *mCameraComp;
     std::vector<MeshComponent *> mMeshComps;
     std::vector<AnimMeshComponent *> mAnimMeshComps;
     AssetManager mAssetManager;

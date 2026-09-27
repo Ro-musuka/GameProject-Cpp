@@ -9,9 +9,9 @@
 #include "Common.h"
 #include "ModelLoader.h"
 
-#include "Actor/Camera.h"
 #include "Actor/Terrain.h"
 
+#include "Component/FollowCameraComponent.h"
 #include "Component/MeshComponent.h"
 #include "Component/AnimMeshComponent.h"
 
@@ -95,6 +95,15 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
     mAnimMeshComps.back()->Play("Walking");
     actor->SetRotation(glm::rotate(glm::mat4(1.f), glm::radians(90.f), Common::UnitX));
 
+    actor = new Actor(GetGame());
+    if (!LoadModel("../assets/models/box.glb", "box"))
+    {
+        return false;
+    }
+    AttachModelComp(actor, "box");
+    actor->SetScale(glm::vec3{10.f, .5f, 17.f});
+    mCameraComp = new FollowCameraComponent(actor);
+
     // mTerrain = new Terrain(GetGame());
     // mTerrain->Load(256, 256);
     // mTerrain->SetScale(glm::vec3(0.1));
@@ -118,7 +127,7 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
     mAssetManager.SetShader("anim", animationShader);
 
     // 視野角, アスペクト比, 近クリップ面, 遠クリップ面
-    mProjection = glm::perspective(glm::radians(45.0f), mScreenWidth / mScreenHeight, 0.1f, 100.0f);
+    mProjection = glm::perspective(glm::radians(45.0f), mScreenWidth / mScreenHeight, 0.1f, 500.0f);
     mWorldTransform = glm::mat4(1.0f);
 
     // 光源色
@@ -137,8 +146,8 @@ void Renderer::Draw()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    mView = glm::lookAt(mGame->GetCamera()->GetPosition(), mTarget, Common::UnitY);
-    mLightDir = -glm::normalize(mGame->GetCamera()->GetPosition());
+    mView = glm::lookAt(mCameraComp->GetCameraPos(), mTarget, Common::UnitY);
+    mLightDir = -glm::normalize(mCameraComp->GetCameraPos());
 
     // 通常モデルの描画
     Shader &shader = mAssetManager.GetShader("base");

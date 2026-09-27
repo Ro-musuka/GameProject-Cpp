@@ -7,7 +7,6 @@
 #include <algorithm>
 
 #include "Actor/Actor.h"
-#include "Actor/Camera.h"
 
 #include "Component/MeshComponent.h"
 
@@ -115,7 +114,6 @@ void Game::GenerateOutput()
 
 bool Game::LoadData()
 {
-    mCamera = new Camera(this);
     return true;
 }
 
