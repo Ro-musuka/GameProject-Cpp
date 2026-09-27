@@ -1,7 +1,6 @@
 #include "AnimMesh.h"
 
 #include "AnimVertex.h"
-#include "../Animation/Skeleton.h"
 
 AnimMesh::AnimMesh(const std::vector<AnimVertex> &vertices, const std::vector<uint32_t> &indices)
 {

@@ -1,8 +1,11 @@
 #include "Terrain.h"
+
+#include <glm/glm.hpp>
+
 #include "../Game.h"
+
 #include "../Graphics/Mesh.h"
 #include "../Graphics/Vertex.h"
-#include <glm/glm.hpp>
 
 Terrain::Terrain(Game *game)
     : Actor(game)

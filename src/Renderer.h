@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <unordered_map>
-#include <filesystem>
 
 #include <SDL3/SDL.h>
 #include <glm/glm.hpp>

@@ -7,7 +7,6 @@
 
 #include "../Graphics/Shader.h"
 #include "../Graphics/Mesh.h"
-#include "../ModelLoader.h"
 
 MeshComponent::MeshComponent(Actor *owner, Mesh *mesh)
     : Component(owner),

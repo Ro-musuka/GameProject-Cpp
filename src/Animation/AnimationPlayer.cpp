@@ -1,8 +1,9 @@
 #include "AnimationPlayer.h"
 
+#include <algorithm>
+
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
-#include <algorithm>
 
 #include "Animation.h"
 #include "Bone.h"

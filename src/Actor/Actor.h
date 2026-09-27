@@ -7,10 +7,13 @@
 
 #include "../Common.h"
 
+class Game;
+class Component;
+
 class Actor
 {
 public:
-    Actor(class Game *game);
+    Actor(Game *game);
     virtual ~Actor();
 
     void Update(float deltaTime);
@@ -20,8 +23,8 @@ public:
     void ProcessInput(const bool *keystate);
     virtual void ActorInput(const bool *keystate);
 
-    void AddComponent(class Component *component);
-    void RemoveComponent(class Component *component);
+    void AddComponent(Component *component);
+    void RemoveComponent(Component *component);
 
     const glm::vec3 &GetPosition() const { return mPosition; }
     void SetPosition(const glm::vec3 &pos)
@@ -48,10 +51,10 @@ public:
     glm::vec3 GetForward() const { return (Common::UnitX * mRotation); }
     glm::vec3 GetRight() const { return (Common::UnitY * mRotation); }
 
-    class Game *GetGame() const { return mGame; }
+    Game *GetGame() const { return mGame; }
 
 private:
-    std::vector<class Component *> mComponents;
+    std::vector<Component *> mComponents;
 
     glm::mat4 mWorldTransform;
     glm::vec3 mPosition;
@@ -60,5 +63,5 @@ private:
 
     bool mRecomputeWorldTransform;
 
-    class Game *mGame;
+    Game *mGame;
 };

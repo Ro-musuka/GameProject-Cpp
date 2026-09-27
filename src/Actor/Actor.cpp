@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 #include "../Game.h"
@@ -66,8 +65,8 @@ void Actor::ComputeWorldTransform()
     if (mRecomputeWorldTransform)
     {
         mRecomputeWorldTransform = false;
-        // Scale, then rotate, then translate
         glm::mat4 model(1.0f);
+        // 位置、回転、拡大
         model = glm::translate(model, mPosition);
         model *= glm::toMat4(mRotation);
         model = glm::scale(model, mScale);
@@ -78,6 +77,7 @@ void Actor::ComputeWorldTransform()
 
 void Actor::AddComponent(Component *comp)
 {
+    // 更新順序にソートしておく
     int myOrder = comp->GetUpdateOrder();
     auto iter = mComponents.begin();
     for (; iter != mComponents.end(); iter++)
@@ -95,6 +95,7 @@ void Actor::RemoveComponent(Component *comp)
     auto iter = std::find(mComponents.begin(), mComponents.end(), comp);
     if (iter != mComponents.end())
     {
+        // 更新順序を守るため, erase()
         mComponents.erase(iter);
     }
 }
