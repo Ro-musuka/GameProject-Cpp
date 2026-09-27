@@ -13,6 +13,7 @@ public:
 
     virtual void ProcessInput(const bool *keystate);
 
+    Actor *GetOwner() { return mOwner; }
     int GetUpdateOrder() const { return mUpdateOrder; }
 
 protected:
