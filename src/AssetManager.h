@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "Animation/Skeleton.h"
+#include "Graphics/Shader.h"
 
 class Mesh;
 class AnimMesh;

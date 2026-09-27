@@ -8,6 +8,8 @@
 class Renderer;
 class Actor;
 class Camera;
+class FollowCameraComponent;
+class AssetManager;
 
 class Game
 {
@@ -21,6 +23,11 @@ public:
     void AddActor(Actor *actor);
     void RemoveActor(Actor *actor);
 
+    Renderer *GetRenderer() const { return mRenderer; }
+    AssetManager *GetAssetManager() const { return mAssetManager; }
+
+    const FollowCameraComponent *GetCameraComp() const { return mCameraComp; }
+
 private:
     void ProcessInput();
     void GameUpdate();
@@ -28,9 +35,14 @@ private:
     bool LoadData();
     void UnloadData();
 
+    bool LoadModel(const std::string &filName, const std::string &modelName);
+    void AttachModelComp(Actor *actor, const std::string &modelName, const std::string &animName = "");
+
     Renderer *mRenderer;
+    AssetManager *mAssetManager;
 
     std::vector<Actor *> mActor;
+    FollowCameraComponent *mCameraComp;
 
     bool mIsRunning;
     Uint32 mTicksCount;

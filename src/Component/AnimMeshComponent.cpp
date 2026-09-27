@@ -1,5 +1,8 @@
 #include "AnimMeshComponent.h"
 
+#include "../Game.h"
+#include "../Renderer.h"
+
 #include "../Actor/Actor.h"
 
 #include "../Graphics/Shader.h"
@@ -11,11 +14,13 @@ AnimMeshComponent::AnimMeshComponent(Actor *owner, AnimMesh *animMesh, Animation
       mAnimationPlayer(animPlayer)
 {
     mAnimMesh = animMesh;
+    mOwner->GetGame()->GetRenderer()->AddAnimMeshComponent(this);
 }
 
 AnimMeshComponent::~AnimMeshComponent()
 {
     delete mAnimMesh;
+    mOwner->GetGame()->GetRenderer()->RemoveAnimMeshComponent(this);
 }
 
 void AnimMeshComponent::Draw(Shader *shader)

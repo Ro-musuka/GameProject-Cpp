@@ -6,13 +6,22 @@
 #include <glm/gtx/quaternion.hpp>
 #include <algorithm>
 
+#include "Renderer.h"
+#include "AssetManager.h"
+#include "ModelLoader.h"
+
 #include "Actor/Actor.h"
 
 #include "Component/MeshComponent.h"
+#include "Component/AnimMeshComponent.h"
+#include "Component/FollowCameraComponent.h"
 
-#include "Graphics/Shader.h"
+#include "Animation/Skeleton.h"
+#include "Animation/Animation.h"
+#include "Animation/AnimationPlayer.h"
 
-#include "Renderer.h"
+#include "Graphics/Mesh.h"
+#include "Graphics/AnimMesh.h"
 
 Game::Game()
     : mIsRunning(true),
@@ -27,6 +36,9 @@ bool Game::Initialize()
         SDL_Log("SDLの初期化に失敗しました: %s", SDL_GetError());
         return false;
     }
+
+    // 先にアセットマナージャーをメモリ確保する必要がある
+    mAssetManager = new AssetManager();
 
     mRenderer = new Renderer(this);
     if (!mRenderer->Initialize(1024.0f, 768.0f))
@@ -114,12 +126,80 @@ void Game::GenerateOutput()
 
 bool Game::LoadData()
 {
+    // モデルのロード
+    Actor *actor = new Actor(this);
+    // 3dモデルのロード
+    if (!LoadModel("../assets/models/BaseMan.glb", "anim"))
+    {
+        return false;
+    }
+    // モデルの肉付け
+    AttachModelComp(actor, "anim", "Walking");
+    actor->SetRotation(glm::angleAxis(glm::radians(90.f), Common::UnitX));
+    // 追従カメラ
+    mCameraComp = new FollowCameraComponent(actor);
+
+    actor = new Actor(this);
+    if (!LoadModel("../assets/models/box.glb", "box"))
+    {
+        return false;
+    }
+    AttachModelComp(actor, "box");
+    actor->SetScale(glm::vec3{10.f, .5f, 17.f});
+
     return true;
+}
+
+bool Game::LoadModel(const std::string &fileName, const std::string &modelName)
+{
+    ModelLoader loader(fileName);
+    if (!loader.IsValid())
+    {
+        SDL_Log("%sの読み込みに失敗しました", fileName.c_str());
+        return false;
+    }
+
+    if (loader.IsAnimation())
+    {
+        mAssetManager->SetAnimMesh(modelName, loader.AnimMeshLoader());
+        mAssetManager->SetSkeleton(modelName, loader.SkeletonLoader());
+        mAssetManager->SetAnimations(modelName, loader.AnimationsLoader());
+    }
+    else
+    {
+        mAssetManager->SetMesh(modelName, loader.MeshLoader());
+    }
+
+    return true;
+}
+
+void Game::AttachModelComp(Actor *actor, const std::string &modelName, const std::string &animName)
+{
+    Mesh *mesh = mAssetManager->GetMesh(modelName);
+    if (mesh != nullptr)
+    {
+        MeshComponent *mc = new MeshComponent(actor, mesh);
+        return;
+    }
+
+    AnimMesh *amesh = mAssetManager->GetAnimMesh(modelName);
+    if (amesh != nullptr)
+    {
+        AnimationPlayer animPlayer(mAssetManager->GetSkeleton(modelName), *mAssetManager->GetAnimations(modelName));
+        AnimMeshComponent *amc = new AnimMeshComponent(actor, amesh, animPlayer);
+        if (!animName.empty())
+        {
+            amc->Play("Walking");
+        }
+        return;
+    }
+
+    SDL_Log("%sがAssetManagerに登録されていません。", modelName.c_str());
 }
 
 void Game::UnloadData()
 {
-    mRenderer->UnloadData();
+    mAssetManager->Unload();
 }
 
 void Game::AddActor(Actor *actor)

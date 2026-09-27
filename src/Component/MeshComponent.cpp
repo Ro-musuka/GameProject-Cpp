@@ -1,5 +1,8 @@
 #include "MeshComponent.h"
 
+#include "../Game.h"
+#include "../Renderer.h"
+
 #include "../Actor/Actor.h"
 
 #include "../Graphics/Shader.h"
@@ -11,11 +14,13 @@ MeshComponent::MeshComponent(Actor *owner, Mesh *mesh)
       mMesh(nullptr)
 {
     mMesh = mesh;
+    mOwner->GetGame()->GetRenderer()->AddMeshComponent(this);
 }
 
 MeshComponent::~MeshComponent()
 {
     delete mMesh;
+    mOwner->GetGame()->GetRenderer()->RemoveMeshComponent(this);
 }
 
 void MeshComponent::Draw(Shader &shader)

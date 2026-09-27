@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#include <algorithm>
+
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -7,29 +9,19 @@
 
 #include "Game.h"
 #include "Common.h"
-#include "ModelLoader.h"
+#include "AssetManager.h"
 
-#include "Actor/Terrain.h"
-
-#include "Component/FollowCameraComponent.h"
 #include "Component/MeshComponent.h"
 #include "Component/AnimMeshComponent.h"
+#include "Component/FollowCameraComponent.h"
 
 #include "Graphics/Shader.h"
-#include "Graphics/Texture.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/AnimMesh.h"
-
-#include "Animation/Skeleton.h"
-#include "Animation/Animation.h"
-#include "Animation/AnimationPlayer.h"
 
 Renderer::Renderer(Game *game)
     : mGame(game),
       mWindow(nullptr),
       mContext(nullptr),
       mTarget{0.0f, 0.0f, 0.0f}
-//   mTerrain(nullptr)
 {
 }
 
@@ -82,53 +74,15 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
     // エラーをクリアしておく
     glEnable(GL_DEPTH_TEST);
 
-    // モデルのロード
-    Actor *actor = new Actor(GetGame());
-    // 3dモデルのロード
-    if (!LoadModel("../assets/models/BaseMan.glb", "anim"))
+    // シェーダー読み込み
+    if (!LoadShader())
     {
+        SDL_Log("シェーダーの読み込みに失敗しました。");
         return false;
     }
-    // モデルの肉付け
-    AttachModelComp(actor, "anim");
-    // 再生するアニメの設定
-    mAnimMeshComps.back()->Play("Walking");
-    actor->SetRotation(glm::angleAxis(glm::radians(90.f), Common::UnitX));
-
-    actor = new Actor(GetGame());
-    if (!LoadModel("../assets/models/box.glb", "box"))
-    {
-        return false;
-    }
-    AttachModelComp(actor, "box");
-    actor->SetScale(glm::vec3{10.f, .5f, 17.f});
-    mCameraComp = new FollowCameraComponent(actor);
-
-    // mTerrain = new Terrain(GetGame());
-    // mTerrain->Load(256, 256);
-    // mTerrain->SetScale(glm::vec3(0.1));
-    // mTerrain->SetPosition({-10.f, 0, -10.f});
-
-    // シェーダーのロード
-    Shader shader;
-    if (!shader.Load("../assets/shaders/Basic.vert", "../assets/shaders/Basic.frag"))
-    {
-        SDL_Log("shaderの読み込みに失敗しました");
-        return false;
-    }
-    mAssetManager.SetShader("base", shader);
-
-    Shader animationShader;
-    if (!animationShader.Load("../assets/shaders/Skinned.vert", "../assets/shaders/Basic.frag"))
-    {
-        SDL_Log("shaderの読み込みに失敗しました");
-        return false;
-    }
-    mAssetManager.SetShader("anim", animationShader);
 
     // 視野角, アスペクト比, 近クリップ面, 遠クリップ面
     mProjection = glm::perspective(glm::radians(45.0f), mScreenWidth / mScreenHeight, 0.1f, 500.0f);
-    mWorldTransform = glm::mat4(1.0f);
 
     // 光源色
     mObjectColor = glm::vec3(0.8f);
@@ -146,11 +100,12 @@ void Renderer::Draw()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    mView = glm::lookAt(mCameraComp->GetCameraPos(), mTarget, Common::UnitY);
-    mLightDir = -glm::normalize(mCameraComp->GetCameraPos());
+    glm::vec3 cameraPos = mGame->GetCameraComp()->GetCameraPos();
+    mView = glm::lookAt(cameraPos, mTarget, Common::UnitY);
+    mLightDir = -glm::normalize(cameraPos);
 
     // 通常モデルの描画
-    Shader &shader = mAssetManager.GetShader("base");
+    Shader &shader = mGame->GetAssetManager()->GetShader("base");
     shader.SetActive();
     shader.SetMatrixUniform("uView", mView);
     shader.SetMatrixUniform("uProjection", mProjection);
@@ -166,7 +121,7 @@ void Renderer::Draw()
     // mTerrain->GetMesh()->Draw();
 
     // アニメーションモデルの描画
-    Shader &animShader = mAssetManager.GetShader("anim");
+    Shader &animShader = mGame->GetAssetManager()->GetShader("anim");
     animShader.SetActive();
     animShader.SetMatrixUniform("uView", mView);
     animShader.SetMatrixUniform("uProjection", mProjection);
@@ -182,58 +137,52 @@ void Renderer::Draw()
     SDL_GL_SwapWindow(mWindow);
 }
 
-bool Renderer::LoadModel(const std::string &fileName, const std::string &modelName)
-{
-    ModelLoader loader(fileName);
-    if (!loader.IsValid())
-    {
-        SDL_Log("%sの読み込みに失敗しました", fileName.c_str());
-        return false;
-    }
-
-    if (loader.IsAnimation())
-    {
-        mAssetManager.SetAnimMesh(modelName, loader.AnimMeshLoader());
-        mAssetManager.SetSkeleton(modelName, loader.SkeletonLoader());
-        mAssetManager.SetAnimations(modelName, loader.AnimationsLoader());
-    }
-    else
-    {
-        mAssetManager.SetMesh(modelName, loader.MeshLoader());
-    }
-
-    return true;
-}
-
-void Renderer::AttachModelComp(Actor *actor, const std::string &modelName)
-{
-    Mesh *mesh = mAssetManager.GetMesh(modelName);
-    if (mesh != nullptr)
-    {
-        MeshComponent *mc = new MeshComponent(actor, mesh);
-        mMeshComps.emplace_back(mc);
-        return;
-    }
-
-    AnimMesh *amesh = mAssetManager.GetAnimMesh(modelName);
-    if (amesh != nullptr)
-    {
-        AnimationPlayer animPlayer(mAssetManager.GetSkeleton(modelName), *mAssetManager.GetAnimations(modelName));
-        AnimMeshComponent *amc = new AnimMeshComponent(actor, amesh, animPlayer);
-        mAnimMeshComps.emplace_back(amc);
-        return;
-    }
-
-    SDL_Log("%sがAssetManagerに登録されていません。", modelName.c_str());
-}
-
-void Renderer::UnloadData()
-{
-    mAssetManager.Unload();
-}
-
 void Renderer::Shutdown()
 {
     SDL_GL_DestroyContext(mContext);
     SDL_DestroyWindow(mWindow);
+}
+
+bool Renderer::LoadShader()
+{
+    AssetManager *assetManager = mGame->GetAssetManager();
+
+    // シェーダーのロード
+    Shader shader;
+    if (!shader.Load("../assets/shaders/Basic.vert", "../assets/shaders/Basic.frag"))
+    {
+        SDL_Log("Basic.vertとBasic.fragのコンパイルに失敗しました");
+        return false;
+    }
+    assetManager->SetShader("base", shader);
+
+    Shader animationShader;
+    if (!animationShader.Load("../assets/shaders/Skinned.vert", "../assets/shaders/Basic.frag"))
+    {
+        SDL_Log("Skinned.vertとBasic.fragのコンパイルに失敗しました");
+        return false;
+    }
+    assetManager->SetShader("anim", animationShader);
+
+    return true;
+}
+
+void Renderer::RemoveMeshComponent(MeshComponent *mesh)
+{
+    auto iter = std::find(mMeshComps.begin(), mMeshComps.end(), mesh);
+    if (iter != mMeshComps.end())
+    {
+        std::iter_swap(iter, mMeshComps.end() - 1);
+        mMeshComps.pop_back();
+    }
+}
+
+void Renderer::RemoveAnimMeshComponent(AnimMeshComponent *amesh)
+{
+    auto iter = std::find(mAnimMeshComps.begin(), mAnimMeshComps.end(), amesh);
+    if (iter != mAnimMeshComps.end())
+    {
+        std::iter_swap(iter, mAnimMeshComps.end() - 1);
+        mAnimMeshComps.pop_back();
+    }
 }

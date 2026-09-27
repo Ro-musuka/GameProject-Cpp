@@ -2,7 +2,6 @@
 
 #include "Graphics/Mesh.h"
 #include "Graphics/AnimMesh.h"
-#include "Graphics/Shader.h"
 #include "Graphics/Texture.h"
 
 #include "Animation/Animation.h"
@@ -55,7 +54,7 @@ Mesh *AssetManager::GetMesh(const std::string &name) const
 
 void AssetManager::SetMesh(const std::string &name, Mesh *mesh)
 {
-    meshes[name] = mesh;
+    meshes.emplace(name, mesh);
 }
 
 AnimMesh *AssetManager::GetAnimMesh(const std::string &name) const
@@ -71,7 +70,7 @@ AnimMesh *AssetManager::GetAnimMesh(const std::string &name) const
 
 void AssetManager::SetAnimMesh(const std::string &name, AnimMesh *animeMesh)
 {
-    animMeshes[name] = animeMesh;
+    animMeshes.emplace(name, animeMesh);
 }
 
 Texture *AssetManager::GetTexture(const std::string &name)
@@ -112,7 +111,7 @@ std::vector<Animation *> *AssetManager::GetAnimations(const std::string &name)
 
 void AssetManager::SetAnimations(const std::string &name, const std::vector<Animation *> &anims)
 {
-    animations[name] = anims;
+    animations.emplace(name, anims);
 }
 
 Skeleton AssetManager::GetSkeleton(const std::string &name) const
@@ -122,7 +121,7 @@ Skeleton AssetManager::GetSkeleton(const std::string &name) const
 
 void AssetManager::SetSkeleton(const std::string &name, Skeleton skeleton)
 {
-    skeletons[name] = skeleton;
+    skeletons.emplace(name, skeleton);
 }
 
 Shader &AssetManager::GetShader(const std::string &name)
@@ -132,5 +131,5 @@ Shader &AssetManager::GetShader(const std::string &name)
 
 void AssetManager::SetShader(const std::string &name, Shader &shader)
 {
-    shaders[name] = shader;
+    shaders.emplace(name, shader);
 }
