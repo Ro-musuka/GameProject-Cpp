@@ -26,8 +26,6 @@ public:
     Renderer *GetRenderer() const { return mRenderer; }
     AssetManager *GetAssetManager() const { return mAssetManager; }
 
-    const FollowCameraComponent *GetCameraComp() const { return mCameraComp; }
-
 private:
     void ProcessInput();
     void GameUpdate();
@@ -42,7 +40,6 @@ private:
     AssetManager *mAssetManager;
 
     std::vector<Actor *> mActor;
-    FollowCameraComponent *mCameraComp;
 
     bool mIsRunning;
     Uint32 mTicksCount;

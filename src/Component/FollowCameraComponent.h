@@ -15,10 +15,13 @@ public:
     void ProcessInput(const bool *keystate) override;
 
     const glm::vec3 &GetCameraPos() const { return mCameraPos; }
+    const glm::vec3 &GetTargetPos() const { return mTarget; }
 
 private:
     glm::vec3 mCameraPos;
+    glm::vec3 mTarget;
 
-    float mFrontSpeed;
-    float mLeftSpeed;
+    float mAngle;
+    float mRadius;
+    float mRotationSpeed;
 };

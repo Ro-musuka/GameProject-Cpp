@@ -18,8 +18,7 @@
 Renderer::Renderer(Game *game)
     : mGame(game),
       mWindow(nullptr),
-      mContext(nullptr),
-      mTarget{0.0f, 0.0f, 0.0f}
+      mContext(nullptr)
 {
 }
 
@@ -98,8 +97,8 @@ void Renderer::Draw()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    glm::vec3 cameraPos = mGame->GetCameraComp()->GetCameraPos();
-    mView = glm::lookAt(cameraPos, mTarget, Common::UnitY);
+    glm::vec3 cameraPos = mCameraComp->GetCameraPos();
+    mView = glm::lookAt(cameraPos, mCameraComp->GetTargetPos(), Common::UnitY);
     mLightDir = -glm::normalize(cameraPos);
 
     // 通常モデルの描画

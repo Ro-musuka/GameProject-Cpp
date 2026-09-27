@@ -134,7 +134,7 @@ bool Game::LoadData()
     AttachModelComp(actor, "anim", "Walking");
     actor->SetRotation(glm::angleAxis(glm::radians(90.f), Common::UnitX));
     // 追従カメラ
-    mCameraComp = new FollowCameraComponent(actor);
+    mRenderer->SetCameraComp(new FollowCameraComponent(actor));
 
     actor = new Actor(this);
     if (!LoadModel("../assets/models/box.glb", "box"))

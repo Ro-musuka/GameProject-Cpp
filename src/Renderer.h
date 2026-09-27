@@ -32,6 +32,8 @@ public:
     void AddAnimMeshComponent(AnimMeshComponent *amesh) { mAnimMeshComps.emplace_back(amesh); }
     void RemoveAnimMeshComponent(AnimMeshComponent *amesh);
 
+    void SetCameraComp(FollowCameraComponent *cameraComp) { mCameraComp = cameraComp; }
+
 private:
     bool LoadShader();
 
@@ -42,8 +44,6 @@ private:
     glm::mat4 mView;
     glm::mat4 mProjection;
 
-    glm::vec3 mTarget;
-
     // 光源
     glm::vec3 mLightDir;
     glm::vec3 mObjectColor;
@@ -51,6 +51,7 @@ private:
 
     std::vector<MeshComponent *> mMeshComps;
     std::vector<AnimMeshComponent *> mAnimMeshComps;
+    FollowCameraComponent *mCameraComp;
 
     Game *mGame;
 
