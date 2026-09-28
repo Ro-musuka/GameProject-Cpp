@@ -11,7 +11,7 @@
 Actor::Actor(Game *game)
     : mGame(game),
       mPosition(glm::vec3(.0f)),
-      mRotation(glm::quat()),
+      mRotation(glm::identity<glm::quat>()),
       mScale(glm::vec3(1.0f)),
       mWorldTransform(1.0f)
 {
@@ -72,6 +72,11 @@ void Actor::ComputeWorldTransform()
         model = glm::scale(model, mScale);
 
         mWorldTransform = model;
+
+        for (auto comp : mComponents)
+        {
+            comp->OnUpdateWorldTransform();
+        }
     }
 }
 
