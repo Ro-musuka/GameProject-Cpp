@@ -45,6 +45,13 @@ void Collision::AABB::Rotate(const glm::quat &q)
     }
 }
 
+bool Collision::AABB::Contains(const glm::vec3 &point) const
+{
+    bool outside = point.x < min.x || point.y < min.y || point.z < min.z ||
+                   point.x > max.x || point.y > max.y || point.z > max.z;
+    return !outside;
+}
+
 bool Collision::Intersect(const AABB &a, const AABB &b)
 {
     bool no = a.max.x < b.min.x || a.max.y < b.min.y || a.max.z < b.min.z ||

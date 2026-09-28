@@ -11,6 +11,8 @@ namespace Collision
         void UpdateMinMax(const glm::vec3 &point);
         void Rotate(const glm::quat &q);
 
+        bool Contains(const glm::vec3 &point) const;
+
         glm::vec3 min;
         glm::vec3 max;
     };
