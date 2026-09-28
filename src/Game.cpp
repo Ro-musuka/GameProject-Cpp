@@ -6,12 +6,16 @@
 #include "Renderer.h"
 #include "AssetManager.h"
 #include "ModelLoader.h"
+#include "PhysWorld.h"
+#include "Collision.h"
 
 #include "Actor/Actor.h"
+#include "Actor/Player.h"
 
 #include "Component/MeshComponent.h"
 #include "Component/AnimMeshComponent.h"
 #include "Component/FollowCameraComponent.h"
+#include "Component/BoxComponent.h"
 
 #include "Animation/Skeleton.h"
 #include "Animation/Animation.h"
@@ -34,7 +38,9 @@ bool Game::Initialize()
         return false;
     }
 
-    // 先にアセットマナージャーをメモリ確保する必要がある
+    mPhysWorld = new PhysWorld(this);
+
+    // rendererより、先にアセットマナージャーをメモリ確保する必要がある
     mAssetManager = new AssetManager();
 
     mRenderer = new Renderer(this);
@@ -66,6 +72,10 @@ void Game::Shutdown()
 {
     UnloadData();
     mRenderer->Shutdown();
+
+    delete mRenderer;
+    delete mAssetManager;
+    delete mPhysWorld;
 
     SDL_Quit();
 }
@@ -110,6 +120,7 @@ void Game::GameUpdate()
     }
     mTicksCount = SDL_GetTicks();
 
+    mPhysWorld->GroundCollision(mPlayer);
     for (auto actor : mActor)
     {
         actor->Update(deltaTime);
@@ -124,24 +135,29 @@ void Game::GenerateOutput()
 bool Game::LoadData()
 {
     // モデルのロード
-    Actor *actor = new Actor(this);
+    mPlayer = new Player(this);
     // 3dモデルのロード
     if (!LoadModel("../assets/models/BaseMan.glb", "anim"))
     {
         return false;
     }
     // モデルの肉付け
-    AttachModelComp(actor, "anim", "Walking");
-    actor->SetRotation(glm::angleAxis(glm::radians(90.f), Common::UnitX));
+    AttachModelComp(mPlayer, "anim", "Walking");
     // 追従カメラ
-    mRenderer->SetCameraComp(new FollowCameraComponent(actor));
+    mRenderer->SetCameraComp(new FollowCameraComponent(mPlayer));
+    mPlayer->SetRotation(glm::angleAxis(glm::radians(90.f), Common::UnitX));
+    mPlayer->SetPosition(glm::vec3(7.f));
 
-    actor = new Actor(this);
+    Actor *actor = new Actor(this);
     if (!LoadModel("../assets/models/box.glb", "box"))
     {
         return false;
     }
     AttachModelComp(actor, "box");
+    BoxComponent *boxComp = new BoxComponent(actor);
+    Collision::AABB aabb(glm::vec3(1.f), glm::vec3(-1.f));
+    boxComp->SetObjectBox(aabb);
+
     actor->SetScale(glm::vec3{10.f, .5f, 17.f});
 
     return true;

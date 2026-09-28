@@ -7,9 +7,11 @@
 
 class Renderer;
 class Actor;
+class Player;
 class Camera;
 class FollowCameraComponent;
 class AssetManager;
+class PhysWorld;
 
 class Game
 {
@@ -25,6 +27,7 @@ public:
 
     Renderer *GetRenderer() const { return mRenderer; }
     AssetManager *GetAssetManager() const { return mAssetManager; }
+    PhysWorld *GetPhysWorld() const { return mPhysWorld; }
 
 private:
     void ProcessInput();
@@ -38,8 +41,10 @@ private:
 
     Renderer *mRenderer;
     AssetManager *mAssetManager;
+    PhysWorld *mPhysWorld;
 
     std::vector<Actor *> mActor;
+    Player *mPlayer;
 
     bool mIsRunning;
     Uint32 mTicksCount;
