@@ -104,3 +104,19 @@ void Actor::RemoveComponent(Component *comp)
         mComponents.erase(iter);
     }
 }
+
+template <typename T>
+T *Actor::GetComponent() const
+{
+    T *result = nullptr;
+    for (Component *comp : mComponents)
+    {
+        result = dynamic_cast<T *>(comp);
+        if (result != nullptr)
+        {
+            break;
+        }
+    }
+
+    return result;
+}

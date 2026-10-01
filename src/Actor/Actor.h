@@ -26,6 +26,9 @@ public:
     void AddComponent(Component *component);
     void RemoveComponent(Component *component);
 
+    void ComputeWorldTransform();
+
+    // ゲッター/セッター
     const glm::vec3 &GetPosition() const { return mPosition; }
     void SetPosition(const glm::vec3 &pos)
     {
@@ -45,13 +48,16 @@ public:
         mRecomputeWorldTransform = true;
     }
 
-    void ComputeWorldTransform();
     const glm::mat4 &GetWorldTransform() const { return mWorldTransform; }
 
     glm::vec3 GetForward() const { return (Common::UnitX * mRotation); }
     glm::vec3 GetRight() const { return (Common::UnitY * mRotation); }
 
     Game *GetGame() const { return mGame; }
+
+protected:
+    template <typename T>
+    T *GetComponent() const;
 
 private:
     std::vector<Component *> mComponents;
