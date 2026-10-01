@@ -26,6 +26,7 @@ void PhysWorld::GroundCollision(Actor *actor)
     glm::vec3 pos = actor->GetPosition();
     for (auto &bc : mBoxComps)
     {
+        if (bc->GetWorldBox().Contains(pos))
         {
             actor->SetPosition({pos.x, bc->GetWorldBox().max.y, pos.z});
         }

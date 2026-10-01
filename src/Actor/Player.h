@@ -11,6 +11,8 @@ public:
     {
         EWalking,
         ERunning,
+        EPunching,
+        EJumping,
         EIdle
     };
 
@@ -28,5 +30,7 @@ private:
 
     float mFrontSpeed;
     float mLeftSpeed;
-    float mGravitySpeed;
+    float mUpSpeed;
+    const float gravityUp;
+    const float gravityDown;
 };

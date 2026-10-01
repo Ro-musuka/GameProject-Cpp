@@ -9,7 +9,9 @@ Player::Player(Game *game)
     : Actor(game),
       mFrontSpeed(.0f),
       mLeftSpeed(.0f),
-      mGravitySpeed(-5.0f)
+      mUpSpeed(0.0f),
+      gravityUp(-13.0f),
+      gravityDown(-10.0f)
 {
 }
 
@@ -24,7 +26,18 @@ void Player::UpdateActor(float deltaTime)
     {
         pos += Common::UnitX * (mLeftSpeed * deltaTime);
     }
-    pos += Common::UnitY * mGravitySpeed * deltaTime;
+
+    if (mUpSpeed >= 0.0f)
+    {
+        mUpSpeed += gravityUp * deltaTime;
+    }
+    else
+    {
+        mUpSpeed += gravityDown * deltaTime;
+    }
+
+    SDL_Log("%f Jump: pos.y=%f", mUpSpeed, pos.y);
+    pos += Common::UnitY * mUpSpeed * deltaTime;
 
     SetPosition(pos);
 }
@@ -50,5 +63,10 @@ void Player::ActorInput(const bool *keystate)
     if (keystate[SDL_SCANCODE_D])
     {
         mLeftSpeed -= 10.0f;
+    }
+
+    if (keystate[SDL_SCANCODE_SPACE])
+    {
+        mUpSpeed = 15.0f;
     }
 }
