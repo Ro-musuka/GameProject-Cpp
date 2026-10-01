@@ -36,6 +36,11 @@ void AnimationPlayer::Play(const std::string &animName)
     mLoop = true;
 }
 
+void AnimationPlayer::Resume()
+{
+    mPlaying = true;
+}
+
 void AnimationPlayer::Stop()
 {
     mPlaying = false;

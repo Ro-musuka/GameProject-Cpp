@@ -19,6 +19,7 @@ public:
     AnimationPlayer(class Skeleton skeleton, const std::vector<Animation *> &animations);
 
     void Play(const std::string &animName);
+    void Resume();
     void Stop();
 
     void Update(float deltaTime);
