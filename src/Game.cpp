@@ -143,6 +143,7 @@ bool Game::LoadData()
     }
     // モデルの肉付け
     AttachModelComp(mPlayer, "anim", "Walking");
+    mPlayer->SetAnimMeshComp(mPlayer->GetComponent<AnimMeshComponent>());
     // 追従カメラ
     mRenderer->SetCameraComp(new FollowCameraComponent(mPlayer));
     mPlayer->SetRotation(glm::angleAxis(glm::radians(90.f), Common::UnitX));

@@ -2,6 +2,7 @@
 
 #include "Actor.h"
 
+class AnimMeshComponent;
 class Game;
 
 class Player : public Actor
@@ -25,7 +26,10 @@ public:
     PlayerState GetPlayerState() const { return mPlayerState; }
     void SetPlayerState(PlayerState state) { mPlayerState = state; }
 
+    void SetAnimMeshComp(AnimMeshComponent *animMeshComp) { mAnimMeshComp = animMeshComp; }
+
 private:
+    AnimMeshComponent *mAnimMeshComp;
     PlayerState mPlayerState;
 
     float mFrontSpeed;

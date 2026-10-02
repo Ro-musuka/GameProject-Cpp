@@ -55,9 +55,21 @@ public:
 
     Game *GetGame() const { return mGame; }
 
-protected:
     template <typename T>
-    T *GetComponent() const;
+    T *GetComponent() const
+    {
+        T *result = nullptr;
+        for (Component *comp : mComponents)
+        {
+            result = dynamic_cast<T *>(comp);
+            if (result != nullptr)
+            {
+                break;
+            }
+        }
+
+        return result;
+    }
 
 private:
     std::vector<Component *> mComponents;

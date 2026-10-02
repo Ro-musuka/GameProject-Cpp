@@ -5,6 +5,8 @@
 #include "../Game.h"
 #include "../Common.h"
 
+#include "../Component/AnimMeshComponent.h"
+
 Player::Player(Game *game)
     : Actor(game),
       mFrontSpeed(.0f),
@@ -35,8 +37,6 @@ void Player::UpdateActor(float deltaTime)
     {
         mUpSpeed += gravityDown * deltaTime;
     }
-
-    SDL_Log("%f Jump: pos.y=%f", mUpSpeed, pos.y);
     pos += Common::UnitY * mUpSpeed * deltaTime;
 
     SetPosition(pos);
@@ -68,5 +68,19 @@ void Player::ActorInput(const bool *keystate)
     if (keystate[SDL_SCANCODE_SPACE])
     {
         mUpSpeed = 15.0f;
+    }
+
+    if (mFrontSpeed == 0.0f && mFrontSpeed == 0.0f)
+    {
+        if (mPlayerState != EIdle)
+        {
+            mAnimMeshComp->Play("Idle");
+            mPlayerState = EIdle;
+        }
+    }
+    else if (mPlayerState != ERunning)
+    {
+        mAnimMeshComp->Play("Running");
+        mPlayerState = ERunning;
     }
 }
