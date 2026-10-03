@@ -10,8 +10,8 @@
 
 Actor::Actor(Game *game)
     : mGame(game),
-      mPosition(glm::vec3(.0f)),
-      mRotation(glm::identity<glm::quat>()),
+      mPosition(Common::ZeroVec3),
+      mRotation(Common::UnitQuat),
       mScale(glm::vec3(1.0f)),
       mWorldTransform(1.0f),
       mRecomputeWorldTransform(true)
