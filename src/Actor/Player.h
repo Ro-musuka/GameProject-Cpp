@@ -32,9 +32,7 @@ private:
     AnimMeshComponent *mAnimMeshComp;
     PlayerState mPlayerState;
 
-    float mFrontSpeed;
-    float mLeftSpeed;
-    float mUpSpeed;
+    glm::vec3 mVelocity;
     const float gravityUp;
     const float gravityDown;
 };

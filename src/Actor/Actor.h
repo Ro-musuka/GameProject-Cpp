@@ -51,7 +51,7 @@ public:
     const glm::mat4 &GetWorldTransform() const { return mWorldTransform; }
 
     glm::vec3 GetForward() const { return (Common::UnitX * mRotation); }
-    glm::vec3 GetRight() const { return (Common::UnitY * mRotation); }
+    glm::vec3 GetRight() const { return (Common::UnitZ * mRotation); }
 
     Game *GetGame() const { return mGame; }
 

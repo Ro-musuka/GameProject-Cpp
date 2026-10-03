@@ -9,9 +9,7 @@
 
 Player::Player(Game *game)
     : Actor(game),
-      mFrontSpeed(.0f),
-      mLeftSpeed(.0f),
-      mUpSpeed(0.0f),
+      mVelocity(Common::ZeroVec3),
       gravityUp(-13.0f),
       gravityDown(-10.0f)
 {
@@ -19,58 +17,53 @@ Player::Player(Game *game)
 
 void Player::UpdateActor(float deltaTime)
 {
-    glm::vec3 pos = GetPosition();
-    if (!Common::NearZero(mFrontSpeed))
+    if (mVelocity.y >= 0.0f)
     {
-        pos += Common::UnitZ * (mFrontSpeed * deltaTime);
-    }
-    if (!Common::NearZero(mLeftSpeed))
-    {
-        pos += Common::UnitX * (mLeftSpeed * deltaTime);
-    }
-
-    if (mUpSpeed >= 0.0f)
-    {
-        mUpSpeed += gravityUp * deltaTime;
+        mVelocity.y += gravityUp * deltaTime;
     }
     else
     {
-        mUpSpeed += gravityDown * deltaTime;
+        mVelocity.y += gravityDown * deltaTime;
     }
-    pos += Common::UnitY * mUpSpeed * deltaTime;
 
+    if (mVelocity.y <= -15.0f)
+    {
+        mVelocity.y = -15.0f;
+    }
+    glm::vec3 pos = GetPosition();
+    // デバックのため停止中
+    // pos += mVelocity * deltaTime;
     SetPosition(pos);
 }
 
 void Player::ActorInput(const bool *keystate)
 {
-    mFrontSpeed = 0.0f;
-    mLeftSpeed = 0.0f;
+    mVelocity.x = mVelocity.z = 0.0f;
 
     if (keystate[SDL_SCANCODE_W])
     {
-        mFrontSpeed += 10.0f;
+        mVelocity += GetForward() * 10.0f;
     }
     if (keystate[SDL_SCANCODE_S])
     {
-        mFrontSpeed -= 10.0f;
+        mVelocity -= GetForward() * 10.0f;
     }
 
     if (keystate[SDL_SCANCODE_A])
     {
-        mLeftSpeed += 10.0f;
+        mVelocity -= GetRight() * 10.0f;
     }
     if (keystate[SDL_SCANCODE_D])
     {
-        mLeftSpeed -= 10.0f;
+        mVelocity += GetRight() * 10.0f;
     }
 
     if (keystate[SDL_SCANCODE_SPACE])
     {
-        mUpSpeed = 15.0f;
+        mVelocity.y = 15.0f;
     }
 
-    if (mFrontSpeed == 0.0f && mFrontSpeed == 0.0f)
+    if (Common::NearZero(mVelocity.x) && Common::NearZero(mVelocity.z))
     {
         if (mPlayerState != EIdle)
         {
@@ -78,9 +71,9 @@ void Player::ActorInput(const bool *keystate)
             mPlayerState = EIdle;
         }
     }
-    else if (mPlayerState != ERunning)
+    else if (mPlayerState != EWalking)
     {
-        mAnimMeshComp->Play("Running");
-        mPlayerState = ERunning;
+        mAnimMeshComp->Play("Walking");
+        mPlayerState = EWalking;
     }
 }
