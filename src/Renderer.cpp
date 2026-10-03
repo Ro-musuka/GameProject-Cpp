@@ -98,7 +98,7 @@ void Renderer::Draw()
     glDisable(GL_BLEND);
 
     glm::vec3 cameraPos = mCameraComp->GetCameraPos();
-    mView = glm::lookAt(cameraPos, mCameraComp->GetTargetPos(), Common::UnitY);
+    mView = glm::lookAt(cameraPos, mCameraComp->GetTarget(), Common::UnitY);
     mLightDir = -glm::normalize(cameraPos);
 
     // 通常モデルの描画

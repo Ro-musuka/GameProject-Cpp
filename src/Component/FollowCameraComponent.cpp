@@ -1,35 +1,67 @@
 #include "FollowCameraComponent.h"
 
 #include <SDL3/SDL.h>
+#include <glm/gtx/quaternion.hpp>
+
+#include "../Common.h"
 
 #include "../Actor/Actor.h"
 
 FollowCameraComponent::FollowCameraComponent(Actor *owner)
     : Component(owner),
       mCameraPos(mOwner->GetPosition()),
-      mTarget{0.0f, 10.0f, 0.0f},
-      mAngle(.0f),
-      mRadius(30.f),
-      mRotationSpeed(.0f)
+      mRotation(Common::UnitQuat),
+      mRotationSpeed(10.0f),
+      mHorzDist(30.0f),
+      mVertDist(10.0f),
+      mTargetDist(100.0f),
+      mKeyPressed{}
 {
+    mTarget = mCameraPos + mOwner->GetForward() * mTargetDist;
 }
 
 void FollowCameraComponent::Update(float deltaTime)
 {
-    mAngle += mRotationSpeed * deltaTime;
     mCameraPos = mOwner->GetPosition();
-    mCameraPos += glm::vec3{mRadius * glm::cos(mAngle), 30.0f, mRadius * glm::sin(mAngle)};
+    mCameraPos -= mOwner->GetForward() * mHorzDist;
+    mCameraPos += Common::UnitY * mVertDist;
+
+    // Kキーが押されたら、右回転
+    if (mKeyPressed[0])
+    {
+        mRotation *= glm::angleAxis(glm::radians(-30.0f) * deltaTime, Common::UnitY);
+    }
+    // Lキーが押されたら、左回転
+    if (mKeyPressed[1])
+    {
+        mRotation *= glm::angleAxis(glm::radians(30.0f) * deltaTime, Common::UnitY);
+    }
+    // キーを離したら、中央へ戻す
+    if (mKeyPressed[2])
+    {
+        mRotation = glm::slerp(mRotation, Common::UnitQuat, mRotationSpeed * deltaTime);
+    }
+
+    mTarget = (mOwner->GetPosition() + mOwner->GetForward() * mTargetDist) * mRotation;
 }
 
 void FollowCameraComponent::ProcessInput(const bool *keystate)
 {
-    mRotationSpeed = 0.0f;
+    for (size_t i = 0; i < mKeyPressed.size(); i++)
+    {
+        mKeyPressed[i] = false;
+    }
+
     if (keystate[SDL_SCANCODE_K])
     {
-        mRotationSpeed += 5.f;
+        mKeyPressed[0] = true;
     }
     if (keystate[SDL_SCANCODE_L])
     {
-        mRotationSpeed -= 5.f;
+        mKeyPressed[1] = true;
+    }
+    if (!keystate[SDL_SCANCODE_K] && !keystate[SDL_SCANCODE_L])
+    {
+        mKeyPressed[2] = true;
     }
 }
