@@ -13,7 +13,8 @@ Actor::Actor(Game *game)
       mPosition(glm::vec3(.0f)),
       mRotation(glm::identity<glm::quat>()),
       mScale(glm::vec3(1.0f)),
-      mWorldTransform(1.0f)
+      mWorldTransform(1.0f),
+      mRecomputeWorldTransform(true)
 {
     mGame->AddActor(this);
 }

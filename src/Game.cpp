@@ -144,10 +144,14 @@ bool Game::LoadData()
     // モデルの肉付け
     AttachModelComp(mPlayer, "anim", "Walking");
     mPlayer->SetAnimMeshComp(mPlayer->GetComponent<AnimMeshComponent>());
+    // AABBの接触判定
+    BoxComponent *boxComp = new BoxComponent(mPlayer);
+    Collision::AABB aabb(glm::vec3(6.0f, 9.2f, 2.0f), glm::vec3(-6.0f, -10.8f, -2.0f));
+    boxComp->SetObjectBox(aabb);
     // 追従カメラ
     mRenderer->SetCameraComp(new FollowCameraComponent(mPlayer));
-    mPlayer->SetRotation(glm::angleAxis(glm::radians(90.f), Common::UnitX));
-    mPlayer->SetPosition(glm::vec3(7.f));
+    // 初期位置
+    mPlayer->SetPosition(glm::vec3(0.0f, 10.8f, .0f));
 
     Actor *actor = new Actor(this);
     if (!LoadModel("../assets/models/box.glb", "box"))
@@ -155,11 +159,11 @@ bool Game::LoadData()
         return false;
     }
     AttachModelComp(actor, "box");
-    BoxComponent *boxComp = new BoxComponent(actor);
-    Collision::AABB aabb(glm::vec3(1.f), glm::vec3(-1.f));
+    boxComp = new BoxComponent(actor);
+    Collision::AABB aabb(glm::vec3(1.0f), glm::vec3(-1.0f));
     boxComp->SetObjectBox(aabb);
 
-    actor->SetScale(glm::vec3{10.f, .5f, 17.f});
+    actor->SetScale(glm::vec3{10.0f, 0.5f, 17.0f});
 
     return true;
 }
