@@ -34,5 +34,5 @@ private:
     // 垂直距離
     const float mVertDist;
 
-    std::array<bool, 3> mKeyPressed;
+    std::array<bool, 5> mKeyPressed;
 };

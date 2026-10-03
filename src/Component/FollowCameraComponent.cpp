@@ -13,7 +13,7 @@ FollowCameraComponent::FollowCameraComponent(Actor *owner)
       mRotation(Common::UnitQuat),
       mRotationSpeed(10.0f),
       mHorzDist(30.0f),
-      mVertDist(10.0f),
+      mVertDist(0.0f),
       mTargetDist(100.0f),
       mKeyPressed{}
 {
@@ -36,8 +36,18 @@ void FollowCameraComponent::Update(float deltaTime)
     {
         mRotation *= glm::angleAxis(glm::radians(30.0f) * deltaTime, Common::UnitY);
     }
-    // キーを離したら、中央へ戻す
+    // Iが押されたら、上へ回転
     if (mKeyPressed[2])
+    {
+        mRotation *= glm::angleAxis(glm::radians(-30.0f) * deltaTime, Common::UnitZ);
+    }
+    // Kが押されたら、下へ回転
+    if (mKeyPressed[3])
+    {
+        mRotation *= glm::angleAxis(glm::radians(30.0f) * deltaTime, Common::UnitZ);
+    }
+    // キーを離したら、中央へ戻す
+    if (mKeyPressed[4])
     {
         mRotation = glm::slerp(mRotation, Common::UnitQuat, mRotationSpeed * deltaTime);
     }
@@ -52,7 +62,7 @@ void FollowCameraComponent::ProcessInput(const bool *keystate)
         mKeyPressed[i] = false;
     }
 
-    if (keystate[SDL_SCANCODE_K])
+    if (keystate[SDL_SCANCODE_J])
     {
         mKeyPressed[0] = true;
     }
@@ -60,8 +70,17 @@ void FollowCameraComponent::ProcessInput(const bool *keystate)
     {
         mKeyPressed[1] = true;
     }
-    if (!keystate[SDL_SCANCODE_K] && !keystate[SDL_SCANCODE_L])
+    if (keystate[SDL_SCANCODE_I])
     {
         mKeyPressed[2] = true;
+    }
+    if (keystate[SDL_SCANCODE_K])
+    {
+        mKeyPressed[3] = true;
+    }
+    if (!keystate[SDL_SCANCODE_J] && !keystate[SDL_SCANCODE_L] &&
+        !keystate[SDL_SCANCODE_I] && !keystate[SDL_SCANCODE_K])
+    {
+        mKeyPressed[4] = true;
     }
 }
