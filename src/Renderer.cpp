@@ -129,7 +129,10 @@ void Renderer::Draw()
     {
         model->Draw(&animShader);
     }
+}
 
+void Renderer::SwapWindow()
+{
     // 画面バッファの交換
     SDL_GL_SwapWindow(mWindow);
 }

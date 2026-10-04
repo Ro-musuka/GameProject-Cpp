@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "Renderer.h"
+#include "Editor.h"
 #include "AssetManager.h"
 #include "ModelLoader.h"
 #include "PhysWorld.h"
@@ -46,10 +47,15 @@ bool Game::Initialize()
     mRenderer = new Renderer(this);
     if (!mRenderer->Initialize(1024.0f, 768.0f))
     {
-        delete mRenderer;
-        mRenderer = nullptr;
-
         SDL_Log("レンダラーの初期化に失敗しました\n");
+        return false;
+    }
+
+    // エディター機能の初期化
+    mEditor = new Editor(mRenderer);
+    if (!mEditor->Init("#version 410"))
+    {
+        SDL_Log("エンジンのエディター機能の初期化に失敗しました。");
         return false;
     }
 
@@ -73,6 +79,10 @@ void Game::Shutdown()
     UnloadData();
     mRenderer->Shutdown();
 
+    if (mEditor != nullptr)
+    {
+        delete mEditor;
+    }
     delete mRenderer;
     delete mAssetManager;
     delete mPhysWorld;
@@ -91,6 +101,7 @@ void Game::ProcessInput()
             mIsRunning = false;
             break;
         }
+        mEditor->ProcessEvent(e);
     }
 
     // キー入力処理
@@ -130,6 +141,8 @@ void Game::GameUpdate()
 void Game::GenerateOutput()
 {
     mRenderer->Draw();
+    mEditor->Draw();
+    mRenderer->SwapWindow();
 }
 
 bool Game::LoadData()

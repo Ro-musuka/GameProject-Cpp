@@ -6,12 +6,13 @@
 #include <glm/glm.hpp>
 
 class Renderer;
+class Editor;
+class AssetManager;
+class PhysWorld;
 class Actor;
 class Player;
 class Camera;
 class FollowCameraComponent;
-class AssetManager;
-class PhysWorld;
 
 class Game
 {
@@ -40,6 +41,7 @@ private:
     void AttachModelComp(Actor *actor, const std::string &modelName, const std::string &animName = "");
 
     Renderer *mRenderer;
+    Editor *mEditor;
     AssetManager *mAssetManager;
     PhysWorld *mPhysWorld;
 

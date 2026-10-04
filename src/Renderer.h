@@ -23,16 +23,23 @@ public:
     void Shutdown();
 
     void Draw();
-
-    Game *GetGame() const { return mGame; }
-    void SetView(const glm::mat4 &view) { mView = view; }
+    void SwapWindow();
 
     void AddMeshComponent(MeshComponent *mesh) { mMeshComps.emplace_back(mesh); }
     void RemoveMeshComponent(MeshComponent *mesh);
     void AddAnimMeshComponent(AnimMeshComponent *amesh) { mAnimMeshComps.emplace_back(amesh); }
     void RemoveAnimMeshComponent(AnimMeshComponent *amesh);
 
+    // ゲッター/セッター
+    float GetScreenWidth() const { return mScreenWidth; }
+    float GetScreenHeight() const { return mScreenHeight; }
+    void SetView(const glm::mat4 &view) { mView = view; }
+
     void SetCameraComp(FollowCameraComponent *cameraComp) { mCameraComp = cameraComp; }
+
+    Game *GetGame() const { return mGame; }
+    SDL_Window *GetWindow() { return mWindow; }
+    const SDL_GLContext &GetContext() { return mContext; }
 
 private:
     bool LoadShader();
