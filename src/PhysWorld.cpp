@@ -15,20 +15,34 @@ PhysWorld::PhysWorld(Game *game)
 {
 }
 
-void PhysWorld::GroundCollision(Actor *actor)
+void PhysWorld::CheckCollisions()
 {
+    // ソートしておくことで、試行回数を減らす
     std::sort(mBoxComps.begin(), mBoxComps.end(),
               [](BoxComponent *a, BoxComponent *b)
               {
                   return a->GetWorldBox().min.x < b->GetWorldBox().min.x;
               });
 
-    glm::vec3 pos = actor->GetPosition();
-    for (auto &bc : mBoxComps)
+    for (size_t i = 0; i < mBoxComps.size(); ++i)
     {
-        if (bc->GetWorldBox().Contains(pos))
+        BoxComponent *a = mBoxComps[i];
+        float max = a->GetWorldBox().max.x;
+        for (size_t j = i + 1; j < mBoxComps.size(); ++j)
         {
-            actor->SetPosition({pos.x, bc->GetWorldBox().max.y, pos.z});
+            BoxComponent *b = mBoxComps[j];
+            // これ以降は衝突がないので抜ける
+            if (b->GetWorldBox().min.x > max)
+            {
+                break;
+            }
+
+            if (Collision::Intersect(a->GetWorldBox(), b->GetWorldBox()))
+            {
+                // 衝突処理
+                a->OnCollision(b);
+                b->OnCollision(a);
+            }
         }
     }
 }

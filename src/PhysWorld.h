@@ -12,7 +12,7 @@ class PhysWorld
 public:
     PhysWorld(Game *game);
 
-    void GroundCollision(Actor *actor);
+    void CheckCollisions();
 
     void AddBox(BoxComponent *box);
     void RemoveBox(BoxComponent *box);
