@@ -14,18 +14,39 @@
 class BoxComponent : public Component
 {
 public:
+    // 衝突タイプ
+    enum CollisionType
+    {
+        EStatic,
+        EDynamic,
+        ETrigger
+    };
+
     BoxComponent(class Actor *owner, int updateOrder = 100);
     ~BoxComponent();
 
     void OnUpdateWorldTransform() override;
 
-    void SetObjectBox(const Collision::AABB &model) { mObjectBox = model; }
+    virtual void OnCollision(BoxComponent *other);
+    void ResolveStaticCollision(BoxComponent *other);
+
+    // ゲッター/セッター
+    void SetObjectBox(const Collision::AABB &model)
+    {
+        mObjectBox = model;
+    }
     const Collision::AABB &GetWorldBox() const { return mWorldBox; }
 
     void SetShouldRotate(bool value) { mShouldRotate = value; }
+
+    CollisionType GetCollisionType() const { return mCollisionType; }
+    void SetCollisionType(CollisionType type) { mCollisionType = type; }
 
 private:
     Collision::AABB mObjectBox;
     Collision::AABB mWorldBox;
     bool mShouldRotate;
+
+    // 衝突タイプ
+    CollisionType mCollisionType;
 };
