@@ -56,8 +56,8 @@ public:
     }
 
     // 見いている方向
-    glm::vec3 GetForward() const { return (Common::UnitX * mRotation); }
-    glm::vec3 GetRight() const { return (Common::UnitZ * mRotation); }
+    glm::vec3 GetForward() const { return (Common::UnitZ * mRotation); }
+    glm::vec3 GetRight() const { return (Common::UnitX * mRotation); }
 
     Game *GetGame() const { return mGame; }
 
