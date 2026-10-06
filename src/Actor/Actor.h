@@ -13,15 +13,6 @@ class Component;
 class Actor
 {
 public:
-    // キャラわけ
-    enum ActorType
-    {
-        EPlayer,
-        EEnemy,
-        EWall,
-        EOther
-    };
-
     Actor(Game *game);
     virtual ~Actor();
 
@@ -64,10 +55,6 @@ public:
         mRecomputeWorldTransform = true;
     }
 
-    // Actorの種類
-    ActorType GetActorType() const { return mActorType; }
-    void SetActorType(ActorType type) { mActorType = type; }
-
     // 見いている方向
     glm::vec3 GetForward() const { return (Common::UnitX * mRotation); }
     glm::vec3 GetRight() const { return (Common::UnitZ * mRotation); }
@@ -99,8 +86,6 @@ private:
     glm::vec3 mPosition;
     glm::quat mRotation;
     glm::vec3 mScale;
-
-    ActorType mActorType;
 
     // 座標変化があった場合にtrue
     // ワールド変換の再計算をすべきか？
