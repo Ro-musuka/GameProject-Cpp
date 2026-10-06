@@ -9,7 +9,6 @@
 #include "Component/MeshComp/MeshComponent.h"
 #include "Component/MeshComp/AnimMeshComponent.h"
 #include "Component/FollowCameraComponent.h"
-#include "Component/CollisionComp/BoxComponent.h"
 #include "Component/CollisionComp/PlayerBoxComponent.h"
 
 #include "Collision/PhysWorld.h"
@@ -160,27 +159,22 @@ bool Game::LoadData()
     // モデルの肉付け
     AttachModelComp(mPlayer, "anim", "Walking");
     mPlayer->SetAnimMeshComp(mPlayer->FindComponent<AnimMeshComponent>());
-    // AABBの接触判定
-    PlayerBoxComponent *playerBox = new PlayerBoxComponent(mPlayer);
-    Collision::AABB aabb1(glm::vec3(6.0f, 9.2f, 2.0f), glm::vec3(-6.0f, -10.8f, -2.0f));
-    playerBox->SetObjectBox(aabb1);
-    playerBox->SetCollisionType(BoxComponent::CollisionType::EDynamic);
+    // AABBの肉付け
+    AttachBoxComp(mPlayer, BoxComponent::CollisionType::EDynamic,
+                  glm::vec3(6.0f, 9.2f, 2.0f), glm::vec3(-6.0f, -10.8f, -2.0f));
     // 追従カメラ
     mRenderer->SetCameraComp(new FollowCameraComponent(mPlayer));
     // 初期位置
     mPlayer->SetPosition(glm::vec3(0.0f, 10.8f, .0f));
 
+    // 壁・床の作成
     Actor *actor = new Actor(this);
     if (!LoadModel("../assets/models/box.glb", "box"))
     {
         return false;
     }
     AttachModelComp(actor, "box");
-    BoxComponent *boxComp = new BoxComponent(actor);
-    Collision::AABB aabb2(glm::vec3(1.0f), glm::vec3(-1.0f));
-    boxComp->SetObjectBox(aabb2);
-    boxComp->SetCollisionType(BoxComponent::CollisionType::EStatic);
-
+    AttachBoxComp(actor, BoxComponent::CollisionType::EStatic, glm::vec3(1.0f), glm::vec3(-1.0f));
     actor->SetScale(glm::vec3{10.0f, 0.5f, 17.0f});
 
     return true;
@@ -231,6 +225,16 @@ void Game::AttachModelComp(Actor *actor, const std::string &modelName, const std
     }
 
     SDL_Log("%sがAssetManagerに登録されていません。", modelName.c_str());
+}
+
+void Game::AttachBoxComp(Actor *actor, BoxComponent::CollisionType type,
+                         const glm::vec3 &max, const glm::vec3 &min)
+{
+    PlayerBoxComponent *playerBox = new PlayerBoxComponent(actor);
+    playerBox->SetCollisionType(type);
+
+    Collision::AABB aabb(max, min);
+    playerBox->SetObjectBox(aabb);
 }
 
 void Game::UnloadData()
