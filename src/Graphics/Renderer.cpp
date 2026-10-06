@@ -5,15 +5,16 @@
 #include <GL/glew.h>
 #include <glm/gtc/quaternion.hpp>
 
-#include "Game.h"
-#include "Common.h"
-#include "AssetManager.h"
+#include "Core/Game.h"
+#include "Core/Common.h"
 
-#include "Component/MeshComponent.h"
-#include "Component/AnimMeshComponent.h"
+#include "Component/MeshComp/MeshComponent.h"
+#include "Component/MeshComp/AnimMeshComponent.h"
 #include "Component/FollowCameraComponent.h"
 
 #include "Graphics/Shader.h"
+
+#include "AssetTools/AssetManager.h"
 
 Renderer::Renderer(Game *game)
     : mGame(game),

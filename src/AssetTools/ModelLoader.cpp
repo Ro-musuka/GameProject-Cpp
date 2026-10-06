@@ -1,13 +1,13 @@
 #include "ModelLoader.h"
 
-#include "Graphics/Vertex.h"
-#include "Graphics/AnimVertex.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/AnimMesh.h"
+#include "Graphics/Mesh_Vertex/Vertex.h"
+#include "Graphics/Mesh_Vertex/Mesh.h"
+#include "Graphics/Mesh_Vertex/AnimVertex.h"
+#include "Graphics/Mesh_Vertex/AnimMesh.h"
 
-#include "Animation/Animation.h"
-#include "Animation/Skeleton.h"
-#include "Animation/Bone.h"
+#include "Graphics/Animation/Animation.h"
+#include "Graphics/Animation/Skeleton.h"
+#include "Graphics/Animation/Bone.h"
 
 ModelLoader::ModelLoader(const std::string &fileName)
 {

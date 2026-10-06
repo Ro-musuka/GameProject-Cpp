@@ -1,12 +1,12 @@
 #include "MeshComponent.h"
 
-#include "../Game.h"
-#include "../Renderer.h"
+#include "Core/Game.h"
 
-#include "../Actor/Actor.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Mesh_Vertex/Mesh.h"
 
-#include "../Graphics/Shader.h"
-#include "../Graphics/Mesh.h"
+#include "Actor/Actor.h"
 
 MeshComponent::MeshComponent(Actor *owner, Mesh *mesh)
     : Component(owner),

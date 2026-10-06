@@ -2,10 +2,10 @@
 
 #include <glm/glm.hpp>
 
-#include "../Game.h"
-#include "../Common.h"
+#include "Core/Game.h"
+#include "Core/Common.h"
 
-#include "../Component/AnimMeshComponent.h"
+#include "Component/MeshComp/AnimMeshComponent.h"
 
 Player::Player(Game *game)
     : Actor(game),

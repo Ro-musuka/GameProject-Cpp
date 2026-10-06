@@ -4,8 +4,8 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Animation/Skeleton.h"
 #include "Graphics/Shader.h"
+#include "Graphics/Animation/Skeleton.h"
 
 class Mesh;
 class AnimMesh;

@@ -3,28 +3,30 @@
 #include <GL/glew.h>
 #include <algorithm>
 
-#include "Renderer.h"
-#include "Editor.h"
-#include "AssetManager.h"
-#include "ModelLoader.h"
-#include "PhysWorld.h"
-#include "Collision.h"
-
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
 
-#include "Component/MeshComponent.h"
-#include "Component/AnimMeshComponent.h"
+#include "Component/MeshComp/MeshComponent.h"
+#include "Component/MeshComp/AnimMeshComponent.h"
 #include "Component/FollowCameraComponent.h"
-#include "Component/BoxComponent.h"
-#include "Component/PlayerBoxComponent.h"
+#include "Component/CollisionComp/BoxComponent.h"
+#include "Component/CollisionComp/PlayerBoxComponent.h"
 
-#include "Animation/Skeleton.h"
-#include "Animation/Animation.h"
-#include "Animation/AnimationPlayer.h"
+#include "Collision/PhysWorld.h"
+#include "Collision/Collision.h"
 
-#include "Graphics/Mesh.h"
-#include "Graphics/AnimMesh.h"
+#include "Graphics/Animation/Skeleton.h"
+#include "Graphics/Animation/Animation.h"
+#include "Graphics/Animation/AnimationPlayer.h"
+
+#include "Graphics/Renderer.h"
+#include "Graphics/Mesh_Vertex/Mesh.h"
+#include "Graphics/Mesh_Vertex/AnimMesh.h"
+
+#include "Editor/Editor.h"
+
+#include "AssetTools/AssetManager.h"
+#include "AssetTools/ModelLoader.h"
 
 Game::Game()
     : mIsRunning(true),

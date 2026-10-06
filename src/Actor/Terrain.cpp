@@ -2,10 +2,10 @@
 
 #include <glm/glm.hpp>
 
-#include "../Game.h"
+#include "Core/Game.h"
 
-#include "../Graphics/Mesh.h"
-#include "../Graphics/Vertex.h"
+#include "Graphics/Mesh_Vertex/Mesh.h"
+#include "Graphics/Mesh_Vertex/Vertex.h"
 
 Terrain::Terrain(Game *game)
     : Actor(game)

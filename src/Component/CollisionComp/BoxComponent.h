@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "Component.h"
-#include "../Collision.h"
+#include "Collision/Collision.h"
+#include "Component/Component.h"
 
 class BoxComponent : public Component
 {

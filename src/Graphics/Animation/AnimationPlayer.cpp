@@ -5,8 +5,8 @@
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
-#include "Animation.h"
-#include "Bone.h"
+#include "Graphics/Animation/Animation.h"
+#include "Graphics/Animation/Bone.h"
 
 AnimationPlayer::AnimationPlayer(Skeleton skeleton, const std::vector<Animation *> &animations)
     : mSkeleton(skeleton),

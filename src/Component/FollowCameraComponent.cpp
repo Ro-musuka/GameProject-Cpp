@@ -3,9 +3,8 @@
 #include <SDL3/SDL.h>
 #include <glm/gtx/quaternion.hpp>
 
-#include "../Common.h"
-
-#include "../Actor/Actor.h"
+#include "Core/Common.h"
+#include "Actor/Actor.h"
 
 FollowCameraComponent::FollowCameraComponent(Actor *owner)
     : Component(owner),

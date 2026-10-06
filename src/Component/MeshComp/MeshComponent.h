@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Component.h"
+#include "Component/Component.h"
 
 class Actor;
 class Mesh;

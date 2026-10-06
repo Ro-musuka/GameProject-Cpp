@@ -8,10 +8,9 @@
 
 #include "BoxComponent.h"
 
-#include "../Game.h"
-#include "../PhysWorld.h"
-
-#include "../Actor/Actor.h"
+#include "Core/Game.h"
+#include "Collision/PhysWorld.h"
+#include "Actor/Actor.h"
 
 BoxComponent::BoxComponent(Actor *owner, int updateOrder)
 	: Component(owner, updateOrder),

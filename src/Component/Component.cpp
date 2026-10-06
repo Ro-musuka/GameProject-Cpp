@@ -1,8 +1,7 @@
 #include "Component.h"
 
-#include "../Game.h"
-
-#include "../Actor/Actor.h"
+#include "Core/Game.h"
+#include "Actor/Actor.h"
 
 Component::Component(Actor *owner, int updateOrder)
     : mOwner(owner),

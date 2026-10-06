@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "../Actor/Actor.h"
+#include "Actor/Actor.h"
 
 PlayerBoxComponent::PlayerBoxComponent(Actor *owner)
     : BoxComponent(owner)

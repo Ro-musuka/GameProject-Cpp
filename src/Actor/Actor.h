@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "../Common.h"
+#include "Core/Common.h"
 
 class Game;
 class Component;

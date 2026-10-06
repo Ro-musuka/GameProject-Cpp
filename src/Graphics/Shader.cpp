@@ -7,7 +7,7 @@
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../Game.h"
+#include "Core/Game.h"
 
 bool Shader::Load(const std::string &vertName, const std::string &fragName)
 {

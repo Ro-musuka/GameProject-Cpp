@@ -1,12 +1,12 @@
 #include "AnimMeshComponent.h"
 
-#include "../Game.h"
-#include "../Renderer.h"
+#include "Core/Game.h"
 
-#include "../Actor/Actor.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Mesh_Vertex/AnimMesh.h"
 
-#include "../Graphics/Shader.h"
-#include "../Graphics/AnimMesh.h"
+#include "Actor/Actor.h"
 
 AnimMeshComponent::AnimMeshComponent(Actor *owner, AnimMesh *animMesh, AnimationPlayer animPlayer)
     : Component(owner),

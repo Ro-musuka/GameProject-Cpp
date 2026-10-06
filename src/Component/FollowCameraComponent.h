@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "Component.h"
+#include "Component/Component.h"
 
 class Actor;
 

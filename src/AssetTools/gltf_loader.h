@@ -13,10 +13,8 @@
 #include "external/tiny_gltf_v3.h"
 #include "external/tinygltf_json_c.h"
 
-#include "Graphics/Mesh.h"
-#include "Graphics/Vertex.h"
-
-#include "Animation/Skeleton.h"
+#include "Graphics/Mesh_Vertex/Mesh.h"
+#include "Graphics/Mesh_Vertex/Vertex.h"
 
 namespace gltf_loader
 {

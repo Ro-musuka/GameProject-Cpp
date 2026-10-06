@@ -1,10 +1,10 @@
 #include "AssetManager.h"
 
-#include "Graphics/Mesh.h"
-#include "Graphics/AnimMesh.h"
+#include "Graphics/Mesh_Vertex/Mesh.h"
+#include "Graphics/Mesh_Vertex/AnimMesh.h"
 #include "Graphics/Texture.h"
 
-#include "Animation/Animation.h"
+#include "Graphics/Animation/Animation.h"
 
 void AssetManager::Unload()
 {

@@ -2,9 +2,8 @@
 
 #include <string>
 
-#include "Component.h"
-
-#include "../Animation/AnimationPlayer.h"
+#include "Component/Component.h"
+#include "Graphics/Animation/AnimationPlayer.h"
 
 class Actor;
 class AnimMesh;

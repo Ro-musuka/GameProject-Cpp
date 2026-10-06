@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Skeleton.h"
+#include "Graphics/Animation/Skeleton.h"
 
 class Skeleton;
 struct Animation;

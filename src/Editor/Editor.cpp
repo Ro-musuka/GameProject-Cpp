@@ -5,7 +5,7 @@
 #include <SDL3/SDL.h>
 #include <GL/glew.h>
 
-#include "Renderer.h"
+#include "Graphics/Renderer.h"
 
 Editor::Editor(Renderer *renderer)
     : mRenderer(renderer)

@@ -4,9 +4,8 @@
 
 #include <glm/gtx/quaternion.hpp>
 
-#include "../Game.h"
-
-#include "../Component/Component.h"
+#include "Core/Game.h"
+#include "Component/Component.h"
 
 Actor::Actor(Game *game)
     : mGame(game),
