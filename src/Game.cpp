@@ -17,6 +17,7 @@
 #include "Component/AnimMeshComponent.h"
 #include "Component/FollowCameraComponent.h"
 #include "Component/BoxComponent.h"
+#include "Component/PlayerBoxComponent.h"
 
 #include "Animation/Skeleton.h"
 #include "Animation/Animation.h"
@@ -131,7 +132,7 @@ void Game::GameUpdate()
     }
     mTicksCount = SDL_GetTicks();
 
-    mPhysWorld->GroundCollision(mPlayer);
+    mPhysWorld->CheckCollisions();
     for (auto actor : mActor)
     {
         actor->Update(deltaTime);
@@ -156,11 +157,12 @@ bool Game::LoadData()
     }
     // モデルの肉付け
     AttachModelComp(mPlayer, "anim", "Walking");
-    mPlayer->SetAnimMeshComp(mPlayer->GetComponent<AnimMeshComponent>());
+    mPlayer->SetAnimMeshComp(mPlayer->FindComponent<AnimMeshComponent>());
     // AABBの接触判定
-    // BoxComponent *boxComp = new BoxComponent(mPlayer);
-    // Collision::AABB aabb1(glm::vec3(6.0f, 9.2f, 2.0f), glm::vec3(-6.0f, -10.8f, -2.0f));
-    // boxComp->SetObjectBox(aabb1);
+    PlayerBoxComponent *playerBox = new PlayerBoxComponent(mPlayer);
+    Collision::AABB aabb1(glm::vec3(6.0f, 9.2f, 2.0f), glm::vec3(-6.0f, -10.8f, -2.0f));
+    playerBox->SetObjectBox(aabb1);
+    playerBox->SetCollisionType(BoxComponent::CollisionType::EDynamic);
     // 追従カメラ
     mRenderer->SetCameraComp(new FollowCameraComponent(mPlayer));
     // 初期位置
@@ -175,6 +177,7 @@ bool Game::LoadData()
     BoxComponent *boxComp = new BoxComponent(actor);
     Collision::AABB aabb2(glm::vec3(1.0f), glm::vec3(-1.0f));
     boxComp->SetObjectBox(aabb2);
+    boxComp->SetCollisionType(BoxComponent::CollisionType::EStatic);
 
     actor->SetScale(glm::vec3{10.0f, 0.5f, 17.0f});
 

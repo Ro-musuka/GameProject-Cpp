@@ -31,8 +31,7 @@ void Player::UpdateActor(float deltaTime)
         mVelocity.y = -15.0f;
     }
     glm::vec3 pos = GetPosition();
-    // デバックのため停止中
-    // pos += mVelocity * deltaTime;
+    pos += mVelocity * deltaTime;
     SetPosition(pos);
 }
 
