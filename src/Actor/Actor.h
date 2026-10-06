@@ -13,7 +13,7 @@ class Component;
 class Actor
 {
 public:
-    // 　キャラわけ
+    // キャラわけ
     enum ActorType
     {
         EPlayer,
@@ -25,16 +25,20 @@ public:
     Actor(Game *game);
     virtual ~Actor();
 
+    // 更新
     void Update(float deltaTime);
     virtual void UpdateActor(float deltaTime);
     void UpdateComponent(float deltaTime);
 
+    // 入力
     void ProcessInput(const bool *keystate);
     virtual void ActorInput(const bool *keystate);
 
     // ワールド変換の計算
     void ComputeWorldTransform();
 
+    // compの追加
+    // comp側が自動で追加・削除を行う
     void AddComponent(Component *component);
     void RemoveComponent(Component *component);
 
@@ -60,14 +64,17 @@ public:
         mRecomputeWorldTransform = true;
     }
 
+    // Actorの種類
     ActorType GetActorType() const { return mActorType; }
     void SetActorType(ActorType type) { mActorType = type; }
 
+    // 見いている方向
     glm::vec3 GetForward() const { return (Common::UnitX * mRotation); }
     glm::vec3 GetRight() const { return (Common::UnitZ * mRotation); }
 
     Game *GetGame() const { return mGame; }
 
+    // 指定のComponentを探索
     template <typename T>
     T *FindComponent() const
     {
@@ -87,6 +94,7 @@ public:
 private:
     std::vector<Component *> mComponents;
 
+    // Actorのデータ
     glm::mat4 mWorldTransform;
     glm::vec3 mPosition;
     glm::quat mRotation;
@@ -94,6 +102,8 @@ private:
 
     ActorType mActorType;
 
+    // 座標変化があった場合にtrue
+    // ワールド変換の再計算をすべきか？
     bool mRecomputeWorldTransform;
 
     Game *mGame;
