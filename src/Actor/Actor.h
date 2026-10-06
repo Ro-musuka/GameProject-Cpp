@@ -23,12 +23,15 @@ public:
     void ProcessInput(const bool *keystate);
     virtual void ActorInput(const bool *keystate);
 
+    // ワールド変換の計算
+    void ComputeWorldTransform();
+
     void AddComponent(Component *component);
     void RemoveComponent(Component *component);
 
-    void ComputeWorldTransform();
-
     // ゲッター/セッター
+    const glm::mat4 &GetWorldTransform() const { return mWorldTransform; }
+
     const glm::vec3 &GetPosition() const { return mPosition; }
     void SetPosition(const glm::vec3 &pos)
     {
@@ -48,15 +51,13 @@ public:
         mRecomputeWorldTransform = true;
     }
 
-    const glm::mat4 &GetWorldTransform() const { return mWorldTransform; }
-
     glm::vec3 GetForward() const { return (Common::UnitX * mRotation); }
     glm::vec3 GetRight() const { return (Common::UnitZ * mRotation); }
 
     Game *GetGame() const { return mGame; }
 
     template <typename T>
-    T *GetComponent() const
+    T *FindComponent() const
     {
         T *result = nullptr;
         for (Component *comp : mComponents)
