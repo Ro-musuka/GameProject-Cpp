@@ -10,8 +10,8 @@
 #include <SDL3/SDL.h>
 
 #define TINYGLTF_IMPLEMENTATION
-#include "external/tiny_gltf_v3.h"
-#include "external/tinygltf_json_c.h"
+#include "external/tiny_gltf/tiny_gltf_v3.h"
+#include "external/tiny_gltf/tinygltf_json_c.h"
 
 #include "Graphics/Mesh_Vertex/Mesh.h"
 #include "Graphics/Mesh_Vertex/Vertex.h"

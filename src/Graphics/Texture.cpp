@@ -2,7 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../external/stb_image.h"
+#include "../external/stb/stb_image.h"
 
 #include <GL/glew.h>
 #include <SDL3/SDL.h>
