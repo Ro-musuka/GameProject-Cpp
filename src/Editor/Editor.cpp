@@ -2,16 +2,26 @@
 
 #include <algorithm>
 
-#include <SDL3/SDL.h>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
+#include "external/imgui/imgui.h"
+#include "external/imgui/imgui_impl_opengl3.h"
+#include "external/imgui/imgui_impl_sdl3.h"
+
+#include "Core/Game.h"
+#include "Core/Common.h"
+#include "Collision/PhysWorld.h"
 #include "Graphics/Renderer.h"
+#include "Actor/Actor.h"
+#include "Component/CollisionComp/BoxComponent.h"
 
-Editor::Editor(Renderer *renderer)
-    : mRenderer(renderer)
+Editor::Editor(Game *game)
+    : mGame(game),
+      mSelectedBox(nullptr),
+      mAngleXYZ(0.0f)
 {
-    mScreenWidth = mRenderer->GetScreenWidth();
-    mScreenHeight = mRenderer->GetScreenHeight();
 }
 
 Editor::~Editor()
@@ -28,7 +38,9 @@ bool Editor::Init(const std::string &openGL_version)
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
 
-    if (!ImGui_ImplSDL3_InitForOpenGL(mRenderer->GetWindow(), mRenderer->GetContext()))
+    Renderer *renderer = mGame->GetRenderer();
+
+    if (!ImGui_ImplSDL3_InitForOpenGL(renderer->GetWindow(), renderer->GetContext()))
     {
         SDL_Log("Dear ImGuiの初期化に失敗しました。\nImGui_ImplSDL3_InitForOpenGL()のエラー");
         return false;
@@ -54,37 +66,73 @@ void Editor::Draw()
 
     ImGui::NewFrame();
 
-    // ウィンドウ作成
-    ImGui::Begin(" ", nullptr);
-    bool temp = true;
-    ImGui::Checkbox("Demo Window", &temp);
-    float f = 0.5f;
-    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    ImGui::ColorEdit3("clear color", (float *)&clear_color);
+    ImGui::Begin("Box Component Editor");
 
-    ImGui::Button("Play");
-    // 同じ行に描画
-    ImGui::SameLine();
+    auto boxes = mGame->GetPhysWorld()->GetBoxComps();
 
-    ImGui::Button("Pause");
+    // 一覧
+    if (ImGui::BeginListBox("Boxes", ImVec2(-FLT_MIN, 180.0f)))
+    {
+        for (size_t i = 0; i < boxes.size(); i++)
+        {
+            BoxComponent *box = boxes[i];
 
-    // ボタン判定
-    ImGui::InvisibleButton(" ", {});
+            // Boxごとに識別できる名前を使用する
+            bool selected = (mSelectedBox == box);
 
-    // 再生バーの作成
-    ImDrawList *draw = ImGui::GetWindowDrawList();
+            if (ImGui::Selectable(std::to_string(i).c_str(), selected))
+            {
+                mSelectedBox = box;
 
-    // 灰色バー
-    // 位置、サイズ、カラー
-    draw->AddRectFilled({},
-                        {},
-                        IM_COL32(80, 80, 80, 255));
+                glm::quat rotation = box->GetOwner()->GetRotation();
+                mAngleXYZ = glm::degrees(glm::eulerAngles(rotation));
+            }
+        }
 
-    ImGui::SameLine();
+        ImGui::EndListBox();
+    }
 
-    // min:sec を出力
-    ImGui::Text(" ");
+    // Boxの追加
+    if (ImGui::Button("Add Box"))
+    {
+        mGame->CreateBox();
+        mSelectedBox = mGame->GetPhysWorld()->GetBoxComps().back();
+    }
+
+    // 選択中のBoxを編集
+    if (mSelectedBox != nullptr)
+    {
+        ImGui::Separator();
+
+        Actor *actor = mSelectedBox->GetOwner();
+
+        // 位置
+        glm::vec3 pos = actor->GetPosition();
+        if (ImGui::InputFloat3("Position: X, Y, Z", &pos.x))
+        {
+            actor->SetPosition(pos);
+        }
+
+        // 回転
+        if (ImGui::SliderFloat3("Roll Pitch Yaw", &mAngleXYZ.x, 0.0f, 359.9f))
+        {
+            glm::vec3 radians = glm::radians(mAngleXYZ);
+
+            glm::quat q = glm::identity<glm::quat>();
+            q *= glm::angleAxis(radians.x, Common::UnitX);
+            q *= glm::angleAxis(radians.y, Common::UnitY);
+            q *= glm::angleAxis(radians.z, Common::UnitZ);
+
+            actor->SetRotation(q);
+        }
+
+        // 拡大
+        glm::vec3 scale = actor->GetScale();
+        if (ImGui::InputFloat3("Scale: X, Y, Z", &scale.x))
+        {
+            actor->SetScale(scale);
+        }
+    }
 
     ImGui::End();
 

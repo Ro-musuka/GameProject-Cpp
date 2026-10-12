@@ -17,6 +17,8 @@ public:
     void AddBox(BoxComponent *box);
     void RemoveBox(BoxComponent *box);
 
+    const std::vector<BoxComponent *> &GetBoxComps() const { return mBoxComps; }
+
 private:
     Game *mGame;
 

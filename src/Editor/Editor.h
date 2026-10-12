@@ -3,17 +3,16 @@
 #include <string>
 
 #include <SDL3/SDL.h>
+#include <glm/glm.hpp>
 
-#include "external/imgui/imgui.h"
-#include "external/imgui/imgui_impl_opengl3.h"
-#include "external/imgui/imgui_impl_sdl3.h"
-
+class Game;
 class Renderer;
+class BoxComponent;
 
 class Editor
 {
 public:
-    Editor(Renderer *renderer);
+    Editor(Game *game);
     ~Editor();
 
     // AudioPlayer初期化後
@@ -23,8 +22,8 @@ public:
     void Draw();
 
 private:
-    float mScreenWidth;
-    float mScreenHeight;
+    glm::vec3 mAngleXYZ;
 
-    Renderer *mRenderer;
+    Game *mGame;
+    BoxComponent *mSelectedBox;
 };
