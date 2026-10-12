@@ -15,6 +15,7 @@ class Actor;
 class Player;
 class Camera;
 class FollowCameraComponent;
+class BoxComponent;
 
 class Game
 {
@@ -28,6 +29,9 @@ public:
     void AddActor(Actor *actor);
     void RemoveActor(Actor *actor);
 
+    void CreateBox();
+
+    // ゲッター/セッター
     Renderer *GetRenderer() const { return mRenderer; }
     AssetManager *GetAssetManager() const { return mAssetManager; }
     PhysWorld *GetPhysWorld() const { return mPhysWorld; }

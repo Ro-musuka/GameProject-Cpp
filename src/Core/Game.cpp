@@ -54,7 +54,7 @@ bool Game::Initialize()
     }
 
     // エディター機能の初期化
-    mEditor = new Editor(mRenderer);
+    mEditor = new Editor(this);
     if (!mEditor->Init("#version 410"))
     {
         SDL_Log("エンジンのエディター機能の初期化に失敗しました。");
@@ -149,15 +149,22 @@ void Game::GenerateOutput()
 
 bool Game::LoadData()
 {
-    // モデルのロード
-    mPlayer = new Player(this);
     // 3dモデルのロード
+    // 壁・床のモデル
+    if (!LoadModel("../assets/models/box.glb", "box"))
+    {
+        return false;
+    }
+
+    // playerのモデル
     if (!LoadModel("../assets/models/BaseMan.glb", "anim"))
     {
         return false;
     }
+
+    mPlayer = new Player(this);
     // モデルの肉付け
-    AttachModelComp(mPlayer, "anim", "Walking");
+    AttachModelComp(mPlayer, "anim");
     mPlayer->SetAnimMeshComp(mPlayer->FindComponent<AnimMeshComponent>());
     // AABBの肉付け
     AttachBoxComp(mPlayer, BoxComponent::CollisionType::EDynamic,
@@ -167,15 +174,7 @@ bool Game::LoadData()
     // 初期位置
     mPlayer->SetPosition(glm::vec3(0.0f, 10.8f, .0f));
 
-    // 壁・床の作成
-    Actor *actor = new Actor(this);
-    if (!LoadModel("../assets/models/box.glb", "box"))
-    {
-        return false;
-    }
-    AttachModelComp(actor, "box");
-    AttachBoxComp(actor, BoxComponent::CollisionType::EStatic, glm::vec3(1.0f), glm::vec3(-1.0f));
-    actor->SetScale(glm::vec3{10.0f, 0.5f, 17.0f});
+    CreateBox();
 
     return true;
 }
@@ -225,6 +224,14 @@ void Game::AttachModelComp(Actor *actor, const std::string &modelName, const std
     }
 
     SDL_Log("%sがAssetManagerに登録されていません。", modelName.c_str());
+}
+
+void Game::CreateBox()
+{
+    Actor *actor = new Actor(this);
+    AttachModelComp(actor, "box");
+    AttachBoxComp(actor, BoxComponent::CollisionType::EStatic, glm::vec3(1.0f), glm::vec3(-1.0f));
+    actor->SetScale(glm::vec3{10.0f, 0.5f, 17.0f});
 }
 
 void Game::AttachBoxComp(Actor *actor, BoxComponent::CollisionType type,
