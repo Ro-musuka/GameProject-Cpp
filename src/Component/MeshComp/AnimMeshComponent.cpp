@@ -19,7 +19,6 @@ AnimMeshComponent::AnimMeshComponent(Actor *owner, AnimMesh *animMesh, Animation
 
 AnimMeshComponent::~AnimMeshComponent()
 {
-    delete mAnimMesh;
     mOwner->GetGame()->GetRenderer()->RemoveAnimMeshComponent(this);
 }
 

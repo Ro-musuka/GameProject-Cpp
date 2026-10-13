@@ -18,7 +18,6 @@ MeshComponent::MeshComponent(Actor *owner, Mesh *mesh)
 
 MeshComponent::~MeshComponent()
 {
-    delete mMesh;
     mOwner->GetGame()->GetRenderer()->RemoveMeshComponent(this);
 }
 
