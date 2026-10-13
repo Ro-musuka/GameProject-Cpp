@@ -13,6 +13,13 @@ class Component;
 class Actor
 {
 public:
+    enum State
+    {
+        EActive,
+        EPaused,
+        EDead
+    };
+
     Actor(Game *game);
     virtual ~Actor();
 
@@ -59,6 +66,9 @@ public:
     glm::vec3 GetForward() const { return (Common::UnitZ * mRotation); }
     glm::vec3 GetRight() const { return (Common::UnitX * mRotation); }
 
+    State GetState() const { return mState; }
+    void SetState(State state) { mState = state; }
+
     Game *GetGame() const { return mGame; }
 
     // 指定のComponentを探索
@@ -86,6 +96,8 @@ private:
     glm::vec3 mPosition;
     glm::quat mRotation;
     glm::vec3 mScale;
+
+    State mState;
 
     // 座標変化があった場合にtrue
     // ワールド変換の再計算をすべきか？
