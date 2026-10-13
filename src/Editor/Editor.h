@@ -21,6 +21,7 @@ public:
     void Draw();
 
 private:
+    // ロール、ピッチ、ヨーのデータ
     glm::vec3 mAngleXYZ;
 
     Game *mGame;

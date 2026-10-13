@@ -13,9 +13,6 @@ class AssetManager;
 class PhysWorld;
 class Actor;
 class Player;
-class Camera;
-class FollowCameraComponent;
-class BoxComponent;
 
 class Game
 {
@@ -29,6 +26,7 @@ public:
     void AddActor(Actor *actor);
     void RemoveActor(Actor *actor);
 
+    // box作成
     void CreateBox();
 
     // ゲッター/セッター
@@ -43,6 +41,7 @@ private:
     bool LoadData();
     void UnloadData();
 
+    // Assimpでのモデル読み込み
     bool LoadModel(const std::string &filName, const std::string &modelName);
     // 3Dモデルの肉付け
     void AttachModelComp(Actor *actor, const std::string &modelName, const std::string &animName = "");
@@ -55,7 +54,9 @@ private:
     AssetManager *mAssetManager;
     PhysWorld *mPhysWorld;
 
+    // actorの更新中を知らせる
     bool mUpdatingActors;
+    // 待機中のactors
     std::vector<Actor *> mPendingActors;
     std::vector<Actor *> mActors;
     Player *mPlayer;

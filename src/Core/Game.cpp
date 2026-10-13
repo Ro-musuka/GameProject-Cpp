@@ -133,14 +133,17 @@ void Game::GameUpdate()
     }
     mTicksCount = SDL_GetTicks();
 
+    // 更新中は追加actorをpendingActorsに追加する
+    // 各actorを更新、衝突処理は後から行う
     mUpdatingActors = true;
-    mPhysWorld->CheckCollisions();
     for (auto actor : mActors)
     {
         actor->Update(deltaTime);
     }
+    mPhysWorld->CheckCollisions();
     mUpdatingActors = false;
 
+    // 待機中だったactorを追加
     for (auto pending : mPendingActors)
     {
         pending->ComputeWorldTransform();
@@ -148,6 +151,7 @@ void Game::GameUpdate()
     }
     mPendingActors.clear();
 
+    // EDead状態のactorを削除
     std::vector<Actor *> deadActors;
     for (auto actor : mActors)
     {
@@ -157,6 +161,7 @@ void Game::GameUpdate()
         }
     }
 
+    // actorの削除はGameのみ行う
     for (auto actor : deadActors)
     {
         delete actor;
@@ -188,10 +193,15 @@ bool Game::LoadData()
     mPlayer = new Player(this);
     // モデルの肉付け
     AttachModelComp(mPlayer, "anim");
+    // プレイヤーにAnimCompをセット
     mPlayer->SetAnimMeshComp(mPlayer->FindComponent<AnimMeshComponent>());
     // AABBの肉付け
-    AttachBoxComp(mPlayer, BoxComponent::CollisionType::EDynamic,
-                  glm::vec3(6.0f, 9.2f, 2.0f), glm::vec3(-6.0f, -10.8f, -2.0f));
+    PlayerBoxComponent *playerBox = new PlayerBoxComponent(mPlayer);
+    // 動的な、aabbで設定
+    playerBox->SetCollisionType(BoxComponent::CollisionType::EDynamic);
+    Collision::AABB aabb(glm::vec3(6.0f, 9.2f, 2.0f), glm::vec3(-6.0f, -10.8f, -2.0f));
+    playerBox->SetObjectBox(aabb);
+
     // 追従カメラ
     mRenderer->SetCameraComp(new FollowCameraComponent(mPlayer));
     // 初期位置
@@ -211,8 +221,10 @@ bool Game::LoadModel(const std::string &fileName, const std::string &modelName)
         return false;
     }
 
+    // 読み込みデータはアセットマネージャにセット
     if (loader.IsAnimation())
     {
+        // アニメなら、メッシュ、スケルトン、アニメデータを読み込む
         mAssetManager->SetAnimMesh(modelName, loader.AnimMeshLoader());
         mAssetManager->SetSkeleton(modelName, loader.SkeletonLoader());
         mAssetManager->SetAnimations(modelName, loader.AnimationsLoader());
@@ -225,8 +237,10 @@ bool Game::LoadModel(const std::string &fileName, const std::string &modelName)
     return true;
 }
 
+// メッシュコンポーネントを割り当て
 void Game::AttachModelComp(Actor *actor, const std::string &modelName, const std::string &animName)
 {
+    // 同じ名前のメッシュをmapから取得
     Mesh *mesh = mAssetManager->GetMesh(modelName);
     if (mesh != nullptr)
     {
@@ -234,6 +248,7 @@ void Game::AttachModelComp(Actor *actor, const std::string &modelName, const std
         return;
     }
 
+    // ないなら、アニメメッシュを探す
     AnimMesh *amesh = mAssetManager->GetAnimMesh(modelName);
     if (amesh != nullptr)
     {
@@ -249,10 +264,12 @@ void Game::AttachModelComp(Actor *actor, const std::string &modelName, const std
     SDL_Log("%sがAssetManagerに登録されていません。", modelName.c_str());
 }
 
+// 基本的に外部から呼ばれる
 void Game::CreateBox()
 {
     Actor *actor = new Actor(this);
     AttachModelComp(actor, "box");
+    // 壁・床の役割なので全てEStatic
     AttachBoxComp(actor, BoxComponent::CollisionType::EStatic, glm::vec3(1.0f), glm::vec3(-1.0f));
     actor->SetScale(glm::vec3{10.0f, 0.5f, 17.0f});
 }
@@ -260,11 +277,11 @@ void Game::CreateBox()
 void Game::AttachBoxComp(Actor *actor, BoxComponent::CollisionType type,
                          const glm::vec3 &max, const glm::vec3 &min)
 {
-    PlayerBoxComponent *playerBox = new PlayerBoxComponent(actor);
-    playerBox->SetCollisionType(type);
+    BoxComponent *box = new BoxComponent(actor);
+    box->SetCollisionType(type);
 
     Collision::AABB aabb(max, min);
-    playerBox->SetObjectBox(aabb);
+    box->SetObjectBox(aabb);
 }
 
 void Game::UnloadData()
