@@ -15,7 +15,6 @@ public:
     Editor(Game *game);
     ~Editor();
 
-    // AudioPlayer初期化後
     bool Init(const std::string &openGL_version);
 
     void ProcessEvent(const SDL_Event &event);
