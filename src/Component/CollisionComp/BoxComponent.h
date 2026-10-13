@@ -23,7 +23,7 @@ public:
     };
 
     BoxComponent(class Actor *owner, int updateOrder = 100);
-    ~BoxComponent();
+    virtual ~BoxComponent();
 
     void OnUpdateWorldTransform() override;
 

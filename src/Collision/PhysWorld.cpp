@@ -53,7 +53,7 @@ void PhysWorld::AddBox(BoxComponent *box)
 void PhysWorld::RemoveBox(BoxComponent *box)
 {
     auto iter = std::find(mBoxComps.begin(), mBoxComps.end(), box);
-    if (iter == mBoxComps.end())
+    if (iter != mBoxComps.end())
     {
         std::iter_swap(iter, mBoxComps.end() - 1);
         mBoxComps.pop_back();
