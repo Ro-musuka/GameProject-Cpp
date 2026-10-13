@@ -71,7 +71,7 @@ void Editor::Draw()
     auto boxes = mGame->GetPhysWorld()->GetBoxComps();
 
     // 一覧
-    if (ImGui::BeginListBox("Boxes", ImVec2(-FLT_MIN, 180.0f)))
+    if (ImGui::BeginListBox(" ", ImVec2(-FLT_MIN, 180.0f)))
     {
         for (size_t i = 0; i < boxes.size(); i++)
         {
@@ -97,6 +97,12 @@ void Editor::Draw()
     {
         mGame->CreateBox();
         mSelectedBox = mGame->GetPhysWorld()->GetBoxComps().back();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Remove Box") && mSelectedBox != nullptr)
+    {
+        mSelectedBox->GetOwner()->SetState(Actor::EDead);
+        mSelectedBox = nullptr;
     }
 
     // 選択中のBoxを編集
