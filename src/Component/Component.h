@@ -6,7 +6,7 @@ class Component
 {
 public:
     Component(Actor *owner, int updateOrder = 100);
-    ~Component();
+    virtual ~Component();
 
     virtual void Update(float deltaTime);
     virtual void OnUpdateWorldTransform();
