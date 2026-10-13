@@ -113,7 +113,7 @@ void Game::ProcessInput()
         mIsRunning = false;
     }
 
-    for (auto actor : mActor)
+    for (auto actor : mActors)
     {
         actor->ProcessInput(keystate);
     }
@@ -133,10 +133,33 @@ void Game::GameUpdate()
     }
     mTicksCount = SDL_GetTicks();
 
+    mUpdatingActors = true;
     mPhysWorld->CheckCollisions();
-    for (auto actor : mActor)
+    for (auto actor : mActors)
     {
         actor->Update(deltaTime);
+    }
+    mUpdatingActors = false;
+
+    for (auto pending : mPendingActors)
+    {
+        pending->ComputeWorldTransform();
+        mActors.emplace_back(pending);
+    }
+    mPendingActors.clear();
+
+    std::vector<Actor *> deadActors;
+    for (auto actor : mActors)
+    {
+        if (actor->GetState() == Actor::EDead)
+        {
+            deadActors.emplace_back(actor);
+        }
+    }
+
+    for (auto actor : deadActors)
+    {
+        delete actor;
     }
 }
 
@@ -251,15 +274,29 @@ void Game::UnloadData()
 
 void Game::AddActor(Actor *actor)
 {
-    mActor.emplace_back(actor);
+    if (mUpdatingActors)
+    {
+        mPendingActors.emplace_back(actor);
+    }
+    else
+    {
+        mActors.emplace_back(actor);
+    }
 }
 
 void Game::RemoveActor(Actor *actor)
 {
-    auto iter = std::find(mActor.begin(), mActor.end(), actor);
-    if (iter != mActor.end())
+    auto iter = std::find(mPendingActors.begin(), mPendingActors.end(), actor);
+    if (iter != mPendingActors.end())
     {
-        std::iter_swap(iter, mActor.end() - 1);
-        mActor.pop_back();
+        std::iter_swap(iter, mPendingActors.end() - 1);
+        mPendingActors.pop_back();
+    }
+
+    iter = std::find(mActors.begin(), mActors.end(), actor);
+    if (iter != mActors.end())
+    {
+        std::iter_swap(iter, mActors.end() - 1);
+        mActors.pop_back();
     }
 }

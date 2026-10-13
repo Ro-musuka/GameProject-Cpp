@@ -55,7 +55,9 @@ private:
     AssetManager *mAssetManager;
     PhysWorld *mPhysWorld;
 
-    std::vector<Actor *> mActor;
+    bool mUpdatingActors;
+    std::vector<Actor *> mPendingActors;
+    std::vector<Actor *> mActors;
     Player *mPlayer;
 
     bool mIsRunning;
