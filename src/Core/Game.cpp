@@ -26,6 +26,7 @@
 
 #include "AssetTools/AssetManager.h"
 #include "AssetTools/ModelLoader.h"
+#include "AssetTools/SceneSerializer.h"
 
 Game::Game()
     : mIsRunning(true),
@@ -190,24 +191,15 @@ bool Game::LoadData()
         return false;
     }
 
-    mPlayer = new Player(this);
-    // モデルの肉付け
-    AttachModelComp(mPlayer, "anim");
-    // プレイヤーにAnimCompをセット
+    // フィールドやactorのJSONデータを読み込み
+    SceneSerializer sceneLoader(this);
+    if (!sceneLoader.LoadScene("../assets/JSON/player.json"))
+    {
+        SDL_Log("../assets/player.jsonが読み込めません");
+        return false;
+    }
+
     mPlayer->SetAnimMeshComp(mPlayer->FindComponent<AnimMeshComponent>());
-    // AABBの肉付け
-    PlayerBoxComponent *playerBox = new PlayerBoxComponent(mPlayer);
-    // 動的な、aabbで設定
-    playerBox->SetCollisionType(BoxComponent::CollisionType::EDynamic);
-    Collision::AABB aabb(glm::vec3(6.0f, 9.2f, 2.0f), glm::vec3(-6.0f, -10.8f, -2.0f));
-    playerBox->SetObjectBox(aabb);
-
-    // 追従カメラ
-    mRenderer->SetCameraComp(new FollowCameraComponent(mPlayer));
-    // 初期位置
-    mPlayer->SetPosition(glm::vec3(0.0f, 10.8f, .0f));
-
-    CreateBox();
 
     return true;
 }
@@ -237,50 +229,14 @@ bool Game::LoadModel(const std::string &fileName, const std::string &modelName)
     return true;
 }
 
-// メッシュコンポーネントを割り当て
-void Game::AttachModelComp(Actor *actor, const std::string &modelName, const std::string &animName)
-{
-    // 同じ名前のメッシュをmapから取得
-    Mesh *mesh = mAssetManager->GetMesh(modelName);
-    if (mesh != nullptr)
-    {
-        MeshComponent *mc = new MeshComponent(actor, mesh);
-        return;
-    }
-
-    // ないなら、アニメメッシュを探す
-    AnimMesh *amesh = mAssetManager->GetAnimMesh(modelName);
-    if (amesh != nullptr)
-    {
-        AnimationPlayer animPlayer(mAssetManager->GetSkeleton(modelName), *mAssetManager->GetAnimations(modelName));
-        AnimMeshComponent *amc = new AnimMeshComponent(actor, amesh, animPlayer);
-        if (!animName.empty())
-        {
-            amc->Play("Walking");
-        }
-        return;
-    }
-
-    SDL_Log("%sがAssetManagerに登録されていません。", modelName.c_str());
-}
-
 // 基本的に外部から呼ばれる
 void Game::CreateBox()
 {
     Actor *actor = new Actor(this);
-    AttachModelComp(actor, "box");
-    // 壁・床の役割なので全てEStatic
-    AttachBoxComp(actor, BoxComponent::CollisionType::EStatic, glm::vec3(1.0f), glm::vec3(-1.0f));
-    actor->SetScale(glm::vec3{10.0f, 0.5f, 17.0f});
-}
-
-void Game::AttachBoxComp(Actor *actor, BoxComponent::CollisionType type,
-                         const glm::vec3 &max, const glm::vec3 &min)
-{
+    new MeshComponent(actor, mAssetManager->GetMesh("box"));
     BoxComponent *box = new BoxComponent(actor);
-    box->SetCollisionType(type);
-
-    Collision::AABB aabb(max, min);
+    box->SetCollisionType(BoxComponent::CollisionType::EStatic);
+    Collision::AABB aabb(glm::vec3(1.0f), glm::vec3(-1.0f));
     box->SetObjectBox(aabb);
 }
 

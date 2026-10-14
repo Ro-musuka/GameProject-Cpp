@@ -13,6 +13,7 @@ Player::Player(Game *game)
       gravityUp(-13.0f),
       gravityDown(-10.0f)
 {
+    GetGame()->SetPlayer(this);
 }
 
 void Player::UpdateActor(float deltaTime)

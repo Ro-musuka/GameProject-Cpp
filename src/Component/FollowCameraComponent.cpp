@@ -4,7 +4,9 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Core/Common.h"
+#include "Core/Game.h"
 #include "Actor/Actor.h"
+#include "Graphics/Renderer.h"
 
 FollowCameraComponent::FollowCameraComponent(Actor *owner)
     : Component(owner),
@@ -16,6 +18,7 @@ FollowCameraComponent::FollowCameraComponent(Actor *owner)
       mTargetDist(100.0f),
       mKeyPressed{}
 {
+    mOwner->GetGame()->GetRenderer()->SetCameraComp(this);
     mTarget = mCameraPos + mOwner->GetForward() * mTargetDist;
 }
 

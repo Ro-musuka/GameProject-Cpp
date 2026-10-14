@@ -33,6 +33,7 @@ public:
     Renderer *GetRenderer() const { return mRenderer; }
     AssetManager *GetAssetManager() const { return mAssetManager; }
     PhysWorld *GetPhysWorld() const { return mPhysWorld; }
+    void SetPlayer(Player *player) { mPlayer = player; }
 
 private:
     void ProcessInput();
@@ -43,11 +44,6 @@ private:
 
     // Assimpでのモデル読み込み
     bool LoadModel(const std::string &filName, const std::string &modelName);
-    // 3Dモデルの肉付け
-    void AttachModelComp(Actor *actor, const std::string &modelName, const std::string &animName = "");
-    // AABBの肉付け
-    void AttachBoxComp(Actor *actor, BoxComponent::CollisionType type,
-                       const glm::vec3 &max_AABB, const glm::vec3 &min_AABB);
 
     Renderer *mRenderer;
     Editor *mEditor;
