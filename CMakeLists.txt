@@ -15,6 +15,7 @@ find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(nlohmann_json REQUIRED CONFIG)
 
 file(GLOB_RECURSE SOURCES
     CONFIGURE_DEPENDS
@@ -35,4 +36,5 @@ target_link_libraries(main PRIVATE
     OpenGL::GL
     GLEW::GLEW
     assimp::assimp
+    nlohmann_json::nlohmann_json
 )
