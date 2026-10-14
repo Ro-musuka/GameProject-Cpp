@@ -21,14 +21,23 @@
 #include "Graphics/Mesh_Vertex/AnimMesh.h"
 
 #include "AssetTools/AssetManager.h"
+#include "AssetTools/ModelLoader.h"
 
 SceneSerializer::SceneSerializer(Game *game)
     : mGame(game)
 {
 }
 
-bool SceneSerializer::SaveScene(const std::string &path)
+bool SceneSerializer::SaveScene_JSON(const std::string &path)
 {
+    // 保存ファイル
+    std::ofstream file(path);
+    if (!file.is_open())
+    {
+        SDL_Log("%sが読み込めません", path.c_str());
+        return false;
+    }
+
     // 保存するJSONデータ
     nlohmann::json root;
     // actor配列データを作成
@@ -60,12 +69,6 @@ bool SceneSerializer::SaveScene(const std::string &path)
         root["actors"].push_back(actorJSON);
     }
 
-    // 保存ファイル
-    std::ofstream file(path);
-    if (!file.is_open())
-    {
-        return false;
-    }
     file << root.dump(4);
 
     return file.good();
@@ -115,11 +118,60 @@ bool SceneSerializer::SaveComponents(nlohmann::json &compJSON, Component *comp)
     return true;
 }
 
-bool SceneSerializer::LoadScene(const std::string &path)
+bool SceneSerializer::LoadModels_JSON(const std::string &path)
 {
     std::ifstream file(path);
     if (!file.is_open())
     {
+        SDL_Log("%sが読み込めません", path.c_str());
+        return false;
+    }
+    nlohmann::json JSON_Data;
+    file >> JSON_Data;
+
+    for (const nlohmann::json &modelJSON : JSON_Data.at("models"))
+    {
+        if (!LoadModelAsset(modelJSON.at("path"), modelJSON.at("name")))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool SceneSerializer::LoadModelAsset(const std::string &path, const std::string &modelName)
+{
+    ModelLoader loader(path);
+    if (!loader.IsValid())
+    {
+        SDL_Log("%sの読み込みに失敗しました", path.c_str());
+        return false;
+    }
+
+    AssetManager *assetManager = mGame->GetAssetManager();
+    // 読み込みデータはアセットマネージャにセット
+    if (loader.IsAnimation())
+    {
+        // アニメなら、メッシュ、スケルトン、アニメデータを読み込む
+        assetManager->SetAnimMesh(modelName, loader.AnimMeshLoader());
+        assetManager->SetSkeleton(modelName, loader.SkeletonLoader());
+        assetManager->SetAnimations(modelName, loader.AnimationsLoader());
+    }
+    else
+    {
+        assetManager->SetMesh(modelName, loader.MeshLoader());
+    }
+
+    return true;
+}
+
+bool SceneSerializer::LoadScene_JSON(const std::string &path)
+{
+    std::ifstream file(path);
+    if (!file.is_open())
+    {
+        SDL_Log("%sが読み込めません", path.c_str());
         return false;
     }
     nlohmann::json JSON_Data;

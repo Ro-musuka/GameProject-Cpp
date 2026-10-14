@@ -14,11 +14,14 @@ class SceneSerializer
 {
 public:
     SceneSerializer(Game *game);
-    bool SaveScene(const std::string &path);
-    bool LoadScene(const std::string &path);
+    bool SaveScene_JSON(const std::string &path);
+    bool LoadModels_JSON(const std::string &path);
+    bool LoadScene_JSON(const std::string &path);
 
 private:
     bool SaveComponents(nlohmann::json &compJSON, Component *comp);
+
+    bool LoadModelAsset(const std::string &path, const std::string &modelName);
 
     Actor *CreateActor(const nlohmann::json &compJSON);
     bool AttachComp(Actor *actor, const nlohmann::json &compJSON);
