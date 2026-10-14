@@ -7,7 +7,6 @@
 #include "Actor/Player.h"
 
 #include "Component/MeshComp/MeshComponent.h"
-#include "Component/MeshComp/AnimMeshComponent.h"
 
 #include "Collision/PhysWorld.h"
 #include "Collision/Collision.h"
@@ -187,8 +186,6 @@ bool Game::LoadData()
     {
         return false;
     }
-
-    mPlayer->SetAnimMeshComp(mPlayer->FindComponent<AnimMeshComponent>());
 
     return true;
 }

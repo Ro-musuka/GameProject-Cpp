@@ -197,6 +197,9 @@ bool SceneSerializer::LoadScene_JSON(const std::string &path)
         actor->SetPosition(ToVec3(transform.at("position")));
         actor->SetRotation(ToQuat(transform.at("rotation")));
         actor->SetScale(ToVec3(transform.at("scale")));
+
+        // 初期化
+        actor->Initialize();
     }
 
     return true;
