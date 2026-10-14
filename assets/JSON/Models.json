@@ -1,0 +1,12 @@
+{
+     "models": [
+        {
+            "path": "../assets/models/box.glb",
+            "name": "box"
+        },
+        {
+            "path": "../assets/models/BaseMan.glb",
+            "name": "anim"
+        }
+    ]
+}

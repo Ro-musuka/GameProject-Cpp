@@ -8,24 +8,15 @@
 
 #include "Component/MeshComp/MeshComponent.h"
 #include "Component/MeshComp/AnimMeshComponent.h"
-#include "Component/FollowCameraComponent.h"
-#include "Component/CollisionComp/PlayerBoxComponent.h"
 
 #include "Collision/PhysWorld.h"
 #include "Collision/Collision.h"
 
-#include "Graphics/Animation/Skeleton.h"
-#include "Graphics/Animation/Animation.h"
-#include "Graphics/Animation/AnimationPlayer.h"
-
 #include "Graphics/Renderer.h"
-#include "Graphics/Mesh_Vertex/Mesh.h"
-#include "Graphics/Mesh_Vertex/AnimMesh.h"
 
 #include "Editor/Editor.h"
 
 #include "AssetTools/AssetManager.h"
-#include "AssetTools/ModelLoader.h"
 #include "AssetTools/SceneSerializer.h"
 
 Game::Game()
@@ -83,7 +74,7 @@ void Game::RunLoop()
 void Game::Shutdown()
 {
     SceneSerializer sceneLoader(this);
-    sceneLoader.SaveScene("../assets/JSON/saveTest.json");
+    sceneLoader.SaveScene_JSON("../assets/JSON/saveTest.json");
 
     UnloadData();
     mRenderer->Shutdown();
@@ -184,54 +175,20 @@ void Game::GenerateOutput()
 
 bool Game::LoadData()
 {
+    SceneSerializer sceneLoader(this);
     // 3dモデルのロード
-    // 壁・床のモデル
-    if (!LoadModel("../assets/models/box.glb", "box"))
-    {
-        return false;
-    }
-
-    // playerのモデル
-    if (!LoadModel("../assets/models/BaseMan.glb", "anim"))
+    if (!sceneLoader.LoadModels_JSON("../assets/JSON/Models.json"))
     {
         return false;
     }
 
     // フィールドやactorのJSONデータを読み込み
-    SceneSerializer sceneLoader(this);
-    const char *path = "../assets/JSON/Scene.json";
-    if (!sceneLoader.LoadScene(path))
+    if (!sceneLoader.LoadScene_JSON("../assets/JSON/Scene.json"))
     {
-        SDL_Log("%sが読み込めません", path);
         return false;
     }
 
     mPlayer->SetAnimMeshComp(mPlayer->FindComponent<AnimMeshComponent>());
-
-    return true;
-}
-
-bool Game::LoadModel(const std::string &fileName, const std::string &modelName)
-{
-    ModelLoader loader(fileName);
-    if (!loader.IsValid())
-    {
-        SDL_Log("%sの読み込みに失敗しました", fileName.c_str());
-        return false;
-    }
-
-    // 読み込みデータはアセットマネージャにセット
-    if (loader.IsAnimation())
-    {
-        // アニメなら、メッシュ、スケルトン、アニメデータを読み込む
-        mAssetManager->SetAnimMesh(modelName, loader.AnimMeshLoader());
-        mAssetManager->SetSkeleton(modelName, loader.SkeletonLoader());
-        mAssetManager->SetAnimations(modelName, loader.AnimationsLoader());
-    }
-    else
-    {
-        mAssetManager->SetMesh(modelName, loader.MeshLoader());
-    }
 
     return true;
 }
