@@ -3,8 +3,6 @@
 #include <fstream>
 
 #include <SDL3/SDL.h>
-#include <nlohmann/json.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 #include "Core/Game.h"
 
@@ -29,14 +27,97 @@ SceneSerializer::SceneSerializer(Game *game)
 {
 }
 
-bool SceneSerializer::SaveScene(const std::string &fileName)
+bool SceneSerializer::SaveScene(const std::string &path)
 {
-    return false;
+    // 保存するJSONデータ
+    nlohmann::json root;
+    // actor配列データを作成
+    root["actors"] = nlohmann::json::array();
+
+    for (Actor *actor : mGame->GetActors())
+    {
+        nlohmann::json actorJSON;
+
+        // Actorの型名を保存
+        actorJSON["type"] = actor->GetTypeName();
+
+        // 各データをJSONのオブジェクトにして、componentJSON配列に追加していく
+        for (Component *comp : actor->GetComponents())
+        {
+            nlohmann::json compJSON = nlohmann::json::object();
+            SaveComponents(compJSON, comp);
+            actorJSON["components"].push_back(compJSON);
+        }
+
+        // transformデータを保存
+        nlohmann::json transform = nlohmann::json::object();
+        transform["position"] = ToJSON(actor->GetPosition());
+        transform["rotation"] = ToJSON(actor->GetRotation());
+        transform["scale"] = ToJSON(actor->GetScale());
+        actorJSON["transform"] = transform;
+
+        // actorデータを配列に追加
+        root["actors"].push_back(actorJSON);
+    }
+
+    // 保存ファイル
+    std::ofstream file(path);
+    if (!file.is_open())
+    {
+        return false;
+    }
+    file << root.dump(4);
+
+    return file.good();
 }
 
-bool SceneSerializer::LoadScene(const std::string &fileName)
+bool SceneSerializer::SaveComponents(nlohmann::json &compJSON, Component *comp)
 {
-    std::ifstream file(fileName);
+    // mesh == nullptr
+    if (MeshComponent *mesh = dynamic_cast<MeshComponent *>(comp))
+    {
+        compJSON["type"] = mesh->GetTypeName();
+        compJSON["model"] = mesh->GetModelName();
+    }
+    else if (AnimMeshComponent *amesh = dynamic_cast<AnimMeshComponent *>(comp))
+    {
+        compJSON["type"] = amesh->GetTypeName();
+        compJSON["model"] = amesh->GetModelName();
+    }
+    // 派生クラスのPlayerBoxは,BoxComponent *にキャスト出来るため、これで良い
+    // BoxComponentとは異なる変数などを設定する際は別定義が必要
+    if (BoxComponent *box = dynamic_cast<BoxComponent *>(comp))
+    {
+        compJSON["type"] = box->GetTypeName();
+        switch (box->GetCollisionType())
+        {
+        case BoxComponent::CollisionType::EStatic:
+            compJSON["collisionType"] = "Static";
+            break;
+        case BoxComponent::CollisionType::EDynamic:
+            compJSON["collisionType"] = "Dynamic";
+            break;
+        case BoxComponent::CollisionType::ETrigger:
+            compJSON["collisionType"] = "Trigger";
+            break;
+        default:
+            compJSON["collisionType"] = " ";
+        }
+        Collision::AABB aabb = box->GetObjectBox();
+        compJSON["max"] = ToJSON(aabb.max);
+        compJSON["min"] = ToJSON(aabb.min);
+    }
+    else if (dynamic_cast<FollowCameraComponent *>(comp) != nullptr)
+    {
+        compJSON["type"] = comp->GetTypeName();
+    }
+
+    return true;
+}
+
+bool SceneSerializer::LoadScene(const std::string &path)
+{
+    std::ifstream file(path);
     if (!file.is_open())
     {
         return false;
@@ -137,7 +218,8 @@ bool SceneSerializer::AttachModelComp(Actor *actor, const std::string &modelName
     Mesh *mesh = assets->GetMesh(modelName);
     if (mesh != nullptr)
     {
-        new MeshComponent(actor, mesh);
+        MeshComponent *mc = new MeshComponent(actor, mesh);
+        mc->SetModelName(modelName);
         return true;
     }
 
@@ -146,7 +228,8 @@ bool SceneSerializer::AttachModelComp(Actor *actor, const std::string &modelName
     {
         // 骨格とアニメデータをまとめて、comp作成
         AnimationPlayer player(AnimationPlayer(assets->GetSkeleton(modelName), *assets->GetAnimations(modelName)));
-        new AnimMeshComponent(actor, amesh, player);
+        AnimMeshComponent *amc = new AnimMeshComponent(actor, amesh, player);
+        amc->SetModelName(modelName);
         return true;
     }
 
@@ -184,19 +267,4 @@ bool SceneSerializer::SettingBoxComp(BoxComponent *box, const nlohmann::json &co
     box->SetObjectBox(Collision::AABB(max, min));
 
     return true;
-}
-
-glm::vec3 SceneSerializer::ToVec3(const nlohmann::json &j)
-{
-    return glm::vec3(j.at(0).get<float>(),
-                     j.at(1).get<float>(),
-                     j.at(2).get<float>());
-}
-
-glm::quat SceneSerializer::ToQuat(const nlohmann::json &j)
-{
-    return glm::quat(j.at(0).get<float>(),
-                     j.at(1).get<float>(),
-                     j.at(2).get<float>(),
-                     j.at(3).get<float>());
 }

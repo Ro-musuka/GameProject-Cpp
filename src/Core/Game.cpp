@@ -82,6 +82,9 @@ void Game::RunLoop()
 
 void Game::Shutdown()
 {
+    SceneSerializer sceneLoader(this);
+    sceneLoader.SaveScene("../assets/JSON/saveTest.json");
+
     UnloadData();
     mRenderer->Shutdown();
 

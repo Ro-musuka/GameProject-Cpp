@@ -1,0 +1,89 @@
+{
+    "actors": [
+        {
+            "components": [
+                {
+                    "model": "anim",
+                    "type": "PlayerBoxComponent"
+                },
+                {
+                    "collisionType": "Dynamic",
+                    "max": [
+                        6.0,
+                        9.199999809265137,
+                        2.0
+                    ],
+                    "min": [
+                        -6.0,
+                        -10.800000190734863,
+                        -2.0
+                    ],
+                    "type": "PlayerBoxComponent"
+                },
+                {
+                    "type": "FollowCameraComponent"
+                }
+            ],
+            "transform": {
+                "position": [
+                    0.0,
+                    11.045000076293945,
+                    0.0
+                ],
+                "rotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "type": "Player"
+        },
+        {
+            "components": [
+                {
+                    "model": "box",
+                    "type": "PlayerBoxComponent"
+                },
+                {
+                    "collisionType": "Static",
+                    "max": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "min": [
+                        -1.0,
+                        -1.0,
+                        -1.0
+                    ],
+                    "type": "BoxComponent"
+                }
+            ],
+            "transform": {
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    10.0,
+                    0.5,
+                    17.0
+                ]
+            },
+            "type": "Actor"
+        }
+    ]
+}
