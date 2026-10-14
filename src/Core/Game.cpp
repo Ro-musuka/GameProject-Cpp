@@ -238,7 +238,8 @@ void Game::CreateBox()
 {
     Actor *actor = new Actor(this);
     // メッシュ肉付け
-    new MeshComponent(actor, mAssetManager->GetMesh("box"));
+    MeshComponent *mc = new MeshComponent(actor, mAssetManager->GetMesh("box"));
+    mc->SetModelName("box");
     // AABB
     BoxComponent *box = new BoxComponent(actor);
     box->SetCollisionType(BoxComponent::CollisionType::EStatic);

@@ -7,4 +7,7 @@ public:
     PlayerBoxComponent(class Actor *owner);
 
     void OnCollision(BoxComponent *otherBC) override;
+
+    // ゲッター/セッター
+    const char *GetTypeName() const override { return "PlayerBoxComponent"; }
 };

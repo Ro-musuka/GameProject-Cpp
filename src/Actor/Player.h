@@ -23,6 +23,8 @@ public:
     void ActorInput(const bool *keystate) override;
 
     // ゲッター/セッター
+    const char *GetTypeName() const override { return "Player"; }
+
     PlayerState GetPlayerState() const { return mPlayerState; }
     void SetPlayerState(PlayerState state) { mPlayerState = state; }
 

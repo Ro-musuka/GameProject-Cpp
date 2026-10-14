@@ -22,7 +22,13 @@ public:
     void Play(const std::string &animName);
     void Stop();
 
+    // ゲッター/セッター
+    const char *GetTypeName() const override { return "PlayerBoxComponent"; }
+    const std::string &GetModelName() const { return mModelName; }
+    void SetModelName(const std::string &modelName) { mModelName = modelName; }
+
 private:
     AnimMesh *mAnimMesh;
     AnimationPlayer mAnimationPlayer;
+    std::string mModelName;
 };

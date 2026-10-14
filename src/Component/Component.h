@@ -13,8 +13,12 @@ public:
 
     virtual void ProcessInput(const bool *keystate);
 
-    Actor *GetOwner() { return mOwner; }
+    // ゲッター/セッター
+    virtual const char *GetTypeName() const { return "Component"; }
+
     int GetUpdateOrder() const { return mUpdateOrder; }
+
+    Actor *GetOwner() { return mOwner; }
 
 protected:
     int mUpdateOrder;

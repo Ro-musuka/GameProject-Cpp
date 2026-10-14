@@ -12,6 +12,9 @@ class Component;
 
 class Actor
 {
+    // GetComponentを触りたいので、
+    friend class SceneSerializer;
+
 public:
     enum State
     {
@@ -41,6 +44,9 @@ public:
     void RemoveComponent(Component *component);
 
     // ゲッター/セッター
+    // 型の名前
+    virtual const char *GetTypeName() const { return "Actor"; }
+
     const glm::mat4 &GetWorldTransform() const { return mWorldTransform; }
 
     const glm::vec3 &GetPosition() const { return mPosition; }
@@ -90,6 +96,7 @@ public:
 
 private:
     std::vector<Component *> mComponents;
+    const std::vector<Component *> &GetComponents() { return mComponents; }
 
     // Actorのデータ
     glm::mat4 mWorldTransform;

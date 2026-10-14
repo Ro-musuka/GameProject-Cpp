@@ -17,6 +17,9 @@ public:
     void Update(float deltaTime) override;
     void ProcessInput(const bool *keystate) override;
 
+    // ゲッター/セッター
+    const char *GetTypeName() const override { return "FollowCameraComponent"; }
+
     const glm::vec3 &GetCameraPos() const { return mCameraPos; }
     const glm::vec3 &GetTarget() const { return mTarget; }
 

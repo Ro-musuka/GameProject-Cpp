@@ -17,6 +17,8 @@ class Player;
 class Game
 {
 public:
+    friend class SceneSerializer;
+
     Game();
 
     bool Initialize();
@@ -44,6 +46,9 @@ private:
 
     // Assimpでのモデル読み込み
     bool LoadModel(const std::string &filName, const std::string &modelName);
+
+    // SceneSerializer用の関数
+    const std::vector<Actor *> &GetActors() const { return mActors; }
 
     Renderer *mRenderer;
     Editor *mEditor;

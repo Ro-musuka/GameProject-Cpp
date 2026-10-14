@@ -31,10 +31,10 @@ public:
     void ResolveStaticCollision(BoxComponent *other);
 
     // ゲッター/セッター
-    void SetObjectBox(const Collision::AABB &model)
-    {
-        mObjectBox = model;
-    }
+    const char *GetTypeName() const override { return "BoxComponent"; }
+
+    void SetObjectBox(const Collision::AABB &model) { mObjectBox = model; }
+    const Collision::AABB &GetObjectBox() const { return mObjectBox; }
     const Collision::AABB &GetWorldBox() const { return mWorldBox; }
 
     void SetShouldRotate(bool value) { mShouldRotate = value; }
