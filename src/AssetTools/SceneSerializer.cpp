@@ -91,97 +91,29 @@ Actor *SceneSerializer::CreateActor(const nlohmann::json &actorJSON)
 
 bool SceneSerializer::AttachComp(Actor *actor, const nlohmann::json &compJSON)
 {
-    Component *comp = nullptr;
     std::string componentType = compJSON.at("type").get<std::string>();
     if (componentType == "BoxComponent")
     {
         BoxComponent *box = new BoxComponent(actor);
-
-        // 衝突物のタイプの設定
-        BoxComponent::CollisionType colType;
-        const std::string &collisionType = compJSON.at("collisionType").get<std::string>();
-        if (collisionType == "Static")
+        if (!SettingBoxComp(box, compJSON))
         {
-            colType = BoxComponent::CollisionType::EStatic;
-        }
-        else if (collisionType == "Dynamic")
-        {
-            colType = BoxComponent::CollisionType::EDynamic;
-        }
-        else if (collisionType == "Trigger")
-        {
-            colType = BoxComponent::CollisionType::ETrigger;
-        }
-        else
-        {
-            SDL_Log("対応するCollisionTypeがありませんでした。: %s", collisionType.c_str());
             return false;
         }
-        box->SetCollisionType(colType);
-
-        // AABBの設定
-        Collision::AABB aabb(ToVec3(compJSON.at("max")), ToVec3(compJSON.at("min")));
-        box->SetObjectBox(aabb);
     }
     else if (componentType == "PlayerBoxComponent")
     {
-        PlayerBoxComponent *playerBox = new PlayerBoxComponent(actor);
-
-        BoxComponent::CollisionType colType;
-        const std::string &collisionType = compJSON.at("collisionType").get<std::string>();
-        if (collisionType == "Static")
+        BoxComponent *playerBox = new PlayerBoxComponent(actor);
+        if (!SettingBoxComp(playerBox, compJSON))
         {
-            colType = BoxComponent::CollisionType::EStatic;
-        }
-        else if (collisionType == "Dynamic")
-        {
-            colType = BoxComponent::CollisionType::EDynamic;
-        }
-        else if (collisionType == "Trigger")
-        {
-            colType = BoxComponent::CollisionType::ETrigger;
-        }
-        else
-        {
-            SDL_Log("対応するCollisionTypeがありませんでした。: %s", collisionType.c_str());
             return false;
         }
-        playerBox->SetCollisionType(colType);
-
-        Collision::AABB aabb(ToVec3(compJSON.at("max")), ToVec3(compJSON.at("min")));
-        playerBox->SetObjectBox(aabb);
     }
-    else if (componentType == "MeshComponent")
+    else if (componentType == "MeshComponent" || componentType == "AnimMeshComponent")
     {
-        // モデル名、アセットマネージャを取得
-        const std::string &modelName = compJSON.at("model").get<std::string>();
-        AssetManager *assets = mGame->GetAssetManager();
-
-        // 名前が登録されているか確認
-        Mesh *mesh = assets->GetMesh(modelName);
-        if (mesh == nullptr)
+        if (!AttachModelComp(actor, compJSON.at("model").get<std::string>()))
         {
-            SDL_Log("%s という名前の3Dモデルは登録されていません。", modelName.c_str());
             return false;
         }
-
-        MeshComponent *mc = new MeshComponent(actor, mesh);
-    }
-    else if (componentType == "AnimMeshComponent")
-    {
-        const std::string &modelName = compJSON.at("model").get<std::string>();
-        AssetManager *assets = mGame->GetAssetManager();
-
-        AnimMesh *amesh = assets->GetAnimMesh(modelName);
-        if (amesh == nullptr)
-        {
-            SDL_Log("%s という名前の3Dモデルは登録されていません。", modelName.c_str());
-            return false;
-        }
-
-        // 骨格とアニメデータをまとめて、comp作成
-        AnimationPlayer animPlayer(assets->GetSkeleton(modelName), *assets->GetAnimations(modelName));
-        AnimMeshComponent *amc = new AnimMeshComponent(actor, amesh, animPlayer);
     }
     else if (componentType == "FollowCameraComponent")
     {
@@ -192,6 +124,64 @@ bool SceneSerializer::AttachComp(Actor *actor, const nlohmann::json &compJSON)
         SDL_Log("対応するComponentがありませんでした。: %s", componentType.c_str());
         return false;
     }
+
+    return true;
+}
+
+bool SceneSerializer::AttachModelComp(Actor *actor, const std::string &modelName)
+{
+    // モデル名、アセットマネージャを取得
+    AssetManager *assets = mGame->GetAssetManager();
+
+    // 名前が登録されているか確認
+    Mesh *mesh = assets->GetMesh(modelName);
+    if (mesh != nullptr)
+    {
+        new MeshComponent(actor, mesh);
+        return true;
+    }
+
+    AnimMesh *amesh = assets->GetAnimMesh(modelName);
+    if (amesh != nullptr)
+    {
+        // 骨格とアニメデータをまとめて、comp作成
+        AnimationPlayer player(AnimationPlayer(assets->GetSkeleton(modelName), *assets->GetAnimations(modelName)));
+        new AnimMeshComponent(actor, amesh, player);
+        return true;
+    }
+
+    SDL_Log("%s という名前の3Dモデルは登録されていません。", modelName.c_str());
+    return false;
+}
+
+bool SceneSerializer::SettingBoxComp(BoxComponent *box, const nlohmann::json &compJSON)
+{
+    // 衝突物のタイプの設定
+    BoxComponent::CollisionType colType;
+    const std::string &collisionType = compJSON.at("collisionType").get<std::string>();
+    if (collisionType == "Static")
+    {
+        colType = BoxComponent::CollisionType::EStatic;
+    }
+    else if (collisionType == "Dynamic")
+    {
+        colType = BoxComponent::CollisionType::EDynamic;
+    }
+    else if (collisionType == "Trigger")
+    {
+        colType = BoxComponent::CollisionType::ETrigger;
+    }
+    else
+    {
+        SDL_Log("対応するCollisionTypeがありませんでした。: %s", collisionType.c_str());
+        return false;
+    }
+    box->SetCollisionType(colType);
+
+    // AABBの設定
+    glm::vec3 max = ToVec3(compJSON.at("max"));
+    glm::vec3 min = ToVec3(compJSON.at("min"));
+    box->SetObjectBox(Collision::AABB(max, min));
 
     return true;
 }

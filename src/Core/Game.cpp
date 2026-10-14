@@ -62,7 +62,10 @@ bool Game::Initialize()
         return false;
     }
 
-    LoadData();
+    if (!LoadData())
+    {
+        return false;
+    }
 
     return true;
 }
@@ -193,9 +196,10 @@ bool Game::LoadData()
 
     // フィールドやactorのJSONデータを読み込み
     SceneSerializer sceneLoader(this);
-    if (!sceneLoader.LoadScene("../assets/JSON/player.json"))
+    const char *path = "../assets/JSON/Scene.json";
+    if (!sceneLoader.LoadScene(path))
     {
-        SDL_Log("../assets/player.jsonが読み込めません");
+        SDL_Log("%sが読み込めません", path);
         return false;
     }
 
@@ -233,15 +237,20 @@ bool Game::LoadModel(const std::string &fileName, const std::string &modelName)
 void Game::CreateBox()
 {
     Actor *actor = new Actor(this);
+    // メッシュ肉付け
     new MeshComponent(actor, mAssetManager->GetMesh("box"));
+    // AABB
     BoxComponent *box = new BoxComponent(actor);
     box->SetCollisionType(BoxComponent::CollisionType::EStatic);
-    Collision::AABB aabb(glm::vec3(1.0f), glm::vec3(-1.0f));
-    box->SetObjectBox(aabb);
+    box->SetObjectBox(Collision::AABB(glm::vec3(1.0f), glm::vec3(-1.0f)));
 }
 
 void Game::UnloadData()
 {
+    while (!mActors.empty())
+    {
+        delete mActors.back();
+    }
     mAssetManager->Unload();
 }
 
