@@ -26,14 +26,16 @@ public:
     Actor(Game *game);
     virtual ~Actor();
 
+    virtual void Initialize() {};
+
     // 更新
     void Update(float deltaTime);
-    virtual void UpdateActor(float deltaTime);
+    virtual void UpdateActor(float deltaTime) {};
     void UpdateComponent(float deltaTime);
 
     // 入力
     void ProcessInput(const bool *keystate);
-    virtual void ActorInput(const bool *keystate);
+    virtual void ActorInput(const bool *keystate) {};
 
     // ワールド変換の計算
     void ComputeWorldTransform();

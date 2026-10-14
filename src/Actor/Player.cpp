@@ -16,6 +16,11 @@ Player::Player(Game *game)
     GetGame()->SetPlayer(this);
 }
 
+void Player::Initialize()
+{
+    mAnimMeshComp = FindComponent<AnimMeshComponent>();
+}
+
 void Player::UpdateActor(float deltaTime)
 {
     if (mVelocity.y >= 0.0f)

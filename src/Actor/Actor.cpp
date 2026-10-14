@@ -34,10 +34,6 @@ void Actor::Update(float deltaTime)
     UpdateActor(deltaTime);
 }
 
-void Actor::UpdateActor(float deltaTime)
-{
-}
-
 void Actor::UpdateComponent(float deltaTime)
 {
     for (auto comp : mComponents)
@@ -54,10 +50,6 @@ void Actor::ProcessInput(const bool *keystate)
     }
 
     ActorInput(keystate);
-}
-
-void Actor::ActorInput(const bool *keystate)
-{
 }
 
 void Actor::ComputeWorldTransform()

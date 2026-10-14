@@ -19,6 +19,8 @@ public:
 
     Player(Game *game);
 
+    void Initialize() override;
+
     void UpdateActor(float deltaTime) override;
     void ActorInput(const bool *keystate) override;
 
