@@ -54,7 +54,7 @@ bool SceneSerializer::SaveScene_JSON(const std::string &path)
         for (Component *comp : actor->GetComponents())
         {
             nlohmann::json compJSON = nlohmann::json::object();
-            SaveComponents(compJSON, comp);
+            SaveComponents_JSON(compJSON, comp);
             actorJSON["components"].push_back(compJSON);
         }
 
@@ -69,57 +69,15 @@ bool SceneSerializer::SaveScene_JSON(const std::string &path)
         root["actors"].push_back(actorJSON);
     }
 
+    // JSONデータをファイルに書き込む
     file << root.dump(4);
 
     return file.good();
 }
 
-bool SceneSerializer::SaveComponents(nlohmann::json &compJSON, Component *comp)
-{
-    // mesh == nullptr
-    if (MeshComponent *mesh = dynamic_cast<MeshComponent *>(comp))
-    {
-        compJSON["type"] = mesh->GetTypeName();
-        compJSON["model"] = mesh->GetModelName();
-    }
-    else if (AnimMeshComponent *amesh = dynamic_cast<AnimMeshComponent *>(comp))
-    {
-        compJSON["type"] = amesh->GetTypeName();
-        compJSON["model"] = amesh->GetModelName();
-    }
-    // 派生クラスのPlayerBoxは,BoxComponent *にキャスト出来るため、これで良い
-    // BoxComponentとは異なる変数などを設定する際は別定義が必要
-    if (BoxComponent *box = dynamic_cast<BoxComponent *>(comp))
-    {
-        compJSON["type"] = box->GetTypeName();
-        switch (box->GetCollisionType())
-        {
-        case BoxComponent::CollisionType::EStatic:
-            compJSON["collisionType"] = "Static";
-            break;
-        case BoxComponent::CollisionType::EDynamic:
-            compJSON["collisionType"] = "Dynamic";
-            break;
-        case BoxComponent::CollisionType::ETrigger:
-            compJSON["collisionType"] = "Trigger";
-            break;
-        default:
-            compJSON["collisionType"] = " ";
-        }
-        Collision::AABB aabb = box->GetObjectBox();
-        compJSON["max"] = ToJSON(aabb.max);
-        compJSON["min"] = ToJSON(aabb.min);
-    }
-    else if (dynamic_cast<FollowCameraComponent *>(comp) != nullptr)
-    {
-        compJSON["type"] = comp->GetTypeName();
-    }
-
-    return true;
-}
-
 bool SceneSerializer::LoadModels_JSON(const std::string &path)
 {
+    // JSONファイル読み込み
     std::ifstream file(path);
     if (!file.is_open())
     {
@@ -131,6 +89,7 @@ bool SceneSerializer::LoadModels_JSON(const std::string &path)
 
     for (const nlohmann::json &modelJSON : JSON_Data.at("models"))
     {
+        // 3Dモデル読み込み
         if (!LoadModelAsset(modelJSON.at("path"), modelJSON.at("name")))
         {
             return false;
@@ -140,34 +99,9 @@ bool SceneSerializer::LoadModels_JSON(const std::string &path)
     return true;
 }
 
-bool SceneSerializer::LoadModelAsset(const std::string &path, const std::string &modelName)
-{
-    ModelLoader loader(path);
-    if (!loader.IsValid())
-    {
-        SDL_Log("%sの読み込みに失敗しました", path.c_str());
-        return false;
-    }
-
-    AssetManager *assetManager = mGame->GetAssetManager();
-    // 読み込みデータはアセットマネージャにセット
-    if (loader.IsAnimation())
-    {
-        // アニメなら、メッシュ、スケルトン、アニメデータを読み込む
-        assetManager->SetAnimMesh(modelName, loader.AnimMeshLoader());
-        assetManager->SetSkeleton(modelName, loader.SkeletonLoader());
-        assetManager->SetAnimations(modelName, loader.AnimationsLoader());
-    }
-    else
-    {
-        assetManager->SetMesh(modelName, loader.MeshLoader());
-    }
-
-    return true;
-}
-
 bool SceneSerializer::LoadScene_JSON(const std::string &path)
 {
+    // JSONファイル読み込み
     std::ifstream file(path);
     if (!file.is_open())
     {
@@ -200,6 +134,84 @@ bool SceneSerializer::LoadScene_JSON(const std::string &path)
 
         // 初期化
         actor->Initialize();
+    }
+
+    return true;
+}
+
+bool SceneSerializer::SaveComponents_JSON(nlohmann::json &compJSON, Component *comp)
+{
+    // それぞれのcompの型をキャストできるかで確かめる
+    // 派生クラスは元クラスでキャストできるので注意
+
+    // mesh == nullptr
+    if (MeshComponent *mesh = dynamic_cast<MeshComponent *>(comp))
+    {
+        compJSON["type"] = mesh->GetTypeName();
+        compJSON["model"] = mesh->GetModelName();
+    }
+    else if (AnimMeshComponent *amesh = dynamic_cast<AnimMeshComponent *>(comp))
+    {
+        compJSON["type"] = amesh->GetTypeName();
+        compJSON["model"] = amesh->GetModelName();
+    }
+    // (PlayerBoxComponent *)は,(BoxComponent *)にキャストされるが、データが同じなので今回は良い
+    // BoxComponentとは異なる変数などを設定する際は別定義が必要
+    if (BoxComponent *box = dynamic_cast<BoxComponent *>(comp))
+    {
+        compJSON["type"] = box->GetTypeName();
+
+        // 衝突タイプ
+        switch (box->GetCollisionType())
+        {
+        case BoxComponent::CollisionType::EStatic:
+            compJSON["collisionType"] = "Static";
+            break;
+        case BoxComponent::CollisionType::EDynamic:
+            compJSON["collisionType"] = "Dynamic";
+            break;
+        case BoxComponent::CollisionType::ETrigger:
+            compJSON["collisionType"] = "Trigger";
+            break;
+        default:
+            compJSON["collisionType"] = " ";
+        }
+
+        // AABB
+        Collision::AABB aabb = box->GetObjectBox();
+        compJSON["max"] = ToJSON(aabb.max);
+        compJSON["min"] = ToJSON(aabb.min);
+    }
+    // else if (dynamic_cast<FollowCameraComponent *>(comp) != nullptr)
+    else
+    {
+        compJSON["type"] = comp->GetTypeName();
+    }
+
+    return true;
+}
+
+bool SceneSerializer::LoadModelAsset(const std::string &path, const std::string &modelName)
+{
+    ModelLoader loader(path);
+    if (!loader.IsValid())
+    {
+        SDL_Log("%sの読み込みに失敗しました", path.c_str());
+        return false;
+    }
+
+    // モデルデータはアセットマネージャで管理する
+    AssetManager *assetManager = mGame->GetAssetManager();
+    if (loader.IsAnimation())
+    {
+        // アニメなら、メッシュ、スケルトン、アニメデータを読み込む
+        assetManager->SetAnimMesh(modelName, loader.AnimMeshLoader());
+        assetManager->SetSkeleton(modelName, loader.SkeletonLoader());
+        assetManager->SetAnimations(modelName, loader.AnimationsLoader());
+    }
+    else
+    {
+        assetManager->SetMesh(modelName, loader.MeshLoader());
     }
 
     return true;
@@ -282,7 +294,7 @@ bool SceneSerializer::AttachModelComp(Actor *actor, const std::string &modelName
     if (amesh != nullptr)
     {
         // 骨格とアニメデータをまとめて、comp作成
-        AnimationPlayer player(AnimationPlayer(assets->GetSkeleton(modelName), *assets->GetAnimations(modelName)));
+        AnimationPlayer player(assets->GetSkeleton(modelName), *assets->GetAnimations(modelName));
         AnimMeshComponent *amc = new AnimMeshComponent(actor, amesh, player);
         amc->SetModelName(modelName);
         return true;

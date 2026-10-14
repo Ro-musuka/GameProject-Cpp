@@ -5,8 +5,6 @@
 #include <SDL3/SDL.h>
 #include <glm/glm.hpp>
 
-#include "Component/CollisionComp/BoxComponent.h"
-
 class Renderer;
 class Editor;
 class AssetManager;
@@ -47,17 +45,17 @@ private:
     // SceneSerializer用の関数
     const std::vector<Actor *> &GetActors() const { return mActors; }
 
+    std::vector<Actor *> mActors;
+    // 待機中のactors
+    std::vector<Actor *> mPendingActors;
+    // actorの更新中を知らせる
+    bool mUpdatingActors;
+    Player *mPlayer;
+
     Renderer *mRenderer;
     Editor *mEditor;
     AssetManager *mAssetManager;
     PhysWorld *mPhysWorld;
-
-    // actorの更新中を知らせる
-    bool mUpdatingActors;
-    // 待機中のactors
-    std::vector<Actor *> mPendingActors;
-    std::vector<Actor *> mActors;
-    Player *mPlayer;
 
     bool mIsRunning;
     Uint32 mTicksCount;

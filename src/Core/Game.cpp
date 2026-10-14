@@ -1,15 +1,11 @@
 #include "Game.h"
 
-#include <GL/glew.h>
 #include <algorithm>
 
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
 
-#include "Component/MeshComp/MeshComponent.h"
-
 #include "Collision/PhysWorld.h"
-#include "Collision/Collision.h"
 
 #include "Graphics/Renderer.h"
 
@@ -17,6 +13,11 @@
 
 #include "AssetTools/AssetManager.h"
 #include "AssetTools/SceneSerializer.h"
+
+// createBox()のためだけの、#include
+#include "Component/MeshComp/MeshComponent.h"
+#include "Component/CollisionComp/BoxComponent.h"
+#include "Collision/Collision.h"
 
 Game::Game()
     : mIsRunning(true),
@@ -26,6 +27,7 @@ Game::Game()
 
 bool Game::Initialize()
 {
+    // SDLの初期化
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
     {
         SDL_Log("SDLの初期化に失敗しました: %s", SDL_GetError());
@@ -34,9 +36,9 @@ bool Game::Initialize()
 
     mPhysWorld = new PhysWorld(this);
 
-    // rendererより、先にアセットマナージャーをメモリ確保する必要がある
     mAssetManager = new AssetManager();
 
+    // shader管理のため、rendererより先にアセットマネージャーを作成する必要がある
     mRenderer = new Renderer(this);
     if (!mRenderer->Initialize(1024.0f, 768.0f))
     {
@@ -44,7 +46,7 @@ bool Game::Initialize()
         return false;
     }
 
-    // エディター機能の初期化
+    // editorがウィンドウとコンテキストを要求するため、先にrendererの作成が必要
     mEditor = new Editor(this);
     if (!mEditor->Init("#version 410"))
     {
