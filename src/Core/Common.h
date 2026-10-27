@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace Common
 {
@@ -10,6 +11,7 @@ namespace Common
     const glm::vec3 UnitZ(0.0f, 0.0f, 1.0f);
     const glm::vec3 ZeroVec3(0.0f, 0.0f, 0.0f);
     const glm::quat UnitQuat = glm::identity<glm::quat>();
+    const glm::mat4 ZUp_To_YUp = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), Common::UnitX);
 
     inline bool NearZero(float val, float epsilon = 0.001f)
     {

@@ -1,5 +1,7 @@
 #include "Skeleton.h"
 
+#include "Core/Common.h"
+
 Skeleton::~Skeleton()
 {
     mBones.clear();
@@ -8,7 +10,15 @@ Skeleton::~Skeleton()
 void Skeleton::Update()
 {
     // アニメーションによる、モデルの移動をなくす
-    mBones[mRootID].localTransform = glm::mat4(1.0f);
+    // 回転成分を変更 : Z軸が上のものをY軸に
+    // https://www.mixamo.com のアニメーションのみ使用するのでこれで良い
+    glm::mat4 transform = mBones[mRootID].localTransform;
+    transform = Common::ZUp_To_YUp * transform;
+    // 平行移動成分だけを除去
+    transform[3][0] = 0.0f;
+    transform[3][1] = 0.0f;
+    transform[3][2] = 0.0f;
+    mBones[mRootID].localTransform = transform;
 
     // 親ボーンのグローバル座標から、子ボーンの座標を決定する
     // 最初はルートボーンから計算
