@@ -20,6 +20,9 @@ public:
 
     void Update(float deltaTime) override;
     void Play(const std::string &animName);
+    void SetLoop(bool loop);
+    bool IsLoop() const;
+    bool IsPlaying();
     void Stop();
 
     // ゲッター/セッター

@@ -33,7 +33,6 @@ void AnimationPlayer::Play(const std::string &animName)
     mCurrentAnim = iter->second;
     mCurrentTime = 0.0f;
     mPlaying = true;
-    mLoop = true;
 }
 
 void AnimationPlayer::Resume()

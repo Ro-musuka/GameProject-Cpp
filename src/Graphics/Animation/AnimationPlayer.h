@@ -26,6 +26,7 @@ public:
 
     // ゲッター/セッター
     void SetLoop(bool loop) { mLoop = loop; }
+    bool IsLoop() const { return mLoop; }
     void SetPlaySpeed(float playSpeed) { mPlaySpeed = playSpeed; }
 
     bool IsPlaying() const { return mPlaying; }

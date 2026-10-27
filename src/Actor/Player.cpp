@@ -63,9 +63,24 @@ void Player::ActorInput(const bool *keystate)
         mVelocity += GetRight() * 10.0f;
     }
 
-    if (keystate[SDL_SCANCODE_SPACE])
+    if (keystate[SDL_SCANCODE_SPACE] && mPlayerState != EJumping)
     {
         mVelocity.y = 15.0f;
+        mAnimMeshComp->Play("Jumping");
+        mAnimMeshComp->SetLoop(false);
+        mPlayerState = EJumping;
+    }
+
+    if (keystate[SDL_SCANCODE_P] && mPlayerState != EPunching)
+    {
+        mAnimMeshComp->Play("Punching");
+        mAnimMeshComp->SetLoop(false);
+        mPlayerState = EPunching;
+    }
+
+    if (mAnimMeshComp->IsPlaying() && !mAnimMeshComp->IsLoop())
+    {
+        return;
     }
 
     if (Common::NearZero(mVelocity.x) && Common::NearZero(mVelocity.z))
@@ -73,12 +88,14 @@ void Player::ActorInput(const bool *keystate)
         if (mPlayerState != EIdle)
         {
             mAnimMeshComp->Play("Idle");
+            mAnimMeshComp->SetLoop(true);
             mPlayerState = EIdle;
         }
     }
     else if (mPlayerState != EWalking)
     {
         mAnimMeshComp->Play("Walking");
+        mAnimMeshComp->SetLoop(true);
         mPlayerState = EWalking;
     }
 }

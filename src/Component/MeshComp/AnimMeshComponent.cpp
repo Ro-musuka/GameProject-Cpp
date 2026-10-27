@@ -43,6 +43,21 @@ void AnimMeshComponent::Play(const std::string &animName)
     mAnimationPlayer.Play(animName);
 }
 
+void AnimMeshComponent::SetLoop(bool loop)
+{
+    mAnimationPlayer.SetLoop(loop);
+}
+
+bool AnimMeshComponent::IsLoop() const
+{
+    return mAnimationPlayer.IsLoop();
+}
+
+bool AnimMeshComponent::IsPlaying()
+{
+    return mAnimationPlayer.IsPlaying();
+}
+
 void AnimMeshComponent::Stop()
 {
     mAnimationPlayer.Stop();
