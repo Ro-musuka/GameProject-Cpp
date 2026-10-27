@@ -36,6 +36,7 @@ public:
     void SetView(const glm::mat4 &view) { mView = view; }
 
     void SetCameraComp(FollowCameraComponent *cameraComp) { mCameraComp = cameraComp; }
+    void SetDebagCamera(Actor *actor) { mDebagCamera = actor; }
 
     Game *GetGame() const { return mGame; }
     SDL_Window *GetWindow() { return mWindow; }
@@ -59,6 +60,7 @@ private:
     std::vector<MeshComponent *> mMeshComps;
     std::vector<AnimMeshComponent *> mAnimMeshComps;
     FollowCameraComponent *mCameraComp;
+    Actor *mDebagCamera;
 
     Game *mGame;
 

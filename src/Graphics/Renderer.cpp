@@ -8,6 +8,8 @@
 #include "Core/Game.h"
 #include "Core/Common.h"
 
+#include "Actor/DebagCamera.h"
+
 #include "Component/MeshComp/MeshComponent.h"
 #include "Component/MeshComp/AnimMeshComponent.h"
 #include "Component/FollowCameraComponent.h"
@@ -51,6 +53,11 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
         SDL_Log("ウィンドウの作成に失敗しました: %s", SDL_GetError());
         return false;
     }
+    // 相対マウスモードを有効にする
+    SDL_SetWindowRelativeMouseMode(mWindow, true);
+
+    mDebagCamera = new DebagCamera(GetGame());
+
     // openGL コンテキストを作成
     mContext = SDL_GL_CreateContext(mWindow);
     if (!mContext)
@@ -98,8 +105,12 @@ void Renderer::Draw()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    glm::vec3 cameraPos = mCameraComp->GetCameraPos();
-    mView = glm::lookAt(cameraPos, mCameraComp->GetTarget(), Common::UnitY);
+    // glm::vec3 cameraPos = mCameraComp->GetCameraPos();
+    // mView = glm::lookAt(cameraPos, mCameraComp->GetTarget(), Common::UnitY);
+    // mLightDir = -glm::normalize(cameraPos);
+
+    glm::vec3 cameraPos = mDebagCamera->GetPosition();
+    mView = glm::lookAt(cameraPos, cameraPos + mDebagCamera->GetForward(), Common::UnitY);
     mLightDir = -glm::normalize(cameraPos);
 
     // 通常モデルの描画
@@ -114,9 +125,6 @@ void Renderer::Draw()
     {
         model->Draw(shader);
     }
-    // mTerrain->ComputeWorldTransform();
-    // shader.SetMatrixUniform("uWorldTransform", mTerrain->GetWorldTransform());
-    // mTerrain->GetMesh()->Draw();
 
     // アニメーションモデルの描画
     Shader &animShader = mGame->GetAssetManager()->GetShader("anim");
