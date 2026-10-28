@@ -2,6 +2,9 @@
 
 #include "Actor.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 class Game;
 class AnimMeshComponent;
 
@@ -20,9 +23,9 @@ public:
     void Initialize() override;
 
     void UpdateActor(float deltaTime) override;
-    void SearchPlayer();
 
-    void ChasePlayer();
+    void ChasePlayer(float deltaTime);
+    void RotateTowardPlayer();
     void ObstacleDetection();
 
     // ゲッター/セッター
@@ -33,6 +36,10 @@ public:
 private:
     AnimMeshComponent *mAnimMeshComp;
     EnemyState mEnemyState;
+
+    bool mIsRotating;
+    float mRotateTimer;
+    glm::quat mTargetRotation;
 
     glm::vec3 mVelocity;
     const float gravityUp;
