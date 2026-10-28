@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include <SDL3/SDL.h>
-#include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Core/Game.h"

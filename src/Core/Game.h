@@ -3,7 +3,6 @@
 #include <vector>
 
 #include <SDL3/SDL.h>
-#include <glm/glm.hpp>
 
 class Renderer;
 class Editor;
@@ -34,6 +33,7 @@ public:
     AssetManager *GetAssetManager() const { return mAssetManager; }
     PhysWorld *GetPhysWorld() const { return mPhysWorld; }
     void SetPlayer(Player *player) { mPlayer = player; }
+    Player *GetPlayer() const { return mPlayer; }
 
 private:
     void ProcessInput();

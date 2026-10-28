@@ -46,11 +46,11 @@ void DebagCamera::ActorInput(const bool *keystate)
 
     if (keystate[SDL_SCANCODE_A])
     {
-        mVelocity -= GetRight() * 30.0f;
+        mVelocity += GetRight() * 30.0f;
     }
     if (keystate[SDL_SCANCODE_D])
     {
-        mVelocity += GetRight() * 30.0f;
+        mVelocity -= GetRight() * 30.0f;
     }
 
     mRotateRightSpeed = 0.0f;

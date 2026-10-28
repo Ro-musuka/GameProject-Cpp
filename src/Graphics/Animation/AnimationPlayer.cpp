@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
 #include "Graphics/Animation/Animation.h"

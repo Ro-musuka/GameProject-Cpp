@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <glm/glm.hpp>
+
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
 
