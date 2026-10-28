@@ -54,9 +54,8 @@ bool Renderer::Initialize(float screenWidth, float screenHeight)
         return false;
     }
     // 相対マウスモードを有効にする
-    SDL_SetWindowRelativeMouseMode(mWindow, true);
-
-    mDebagCamera = new DebagCamera(GetGame());
+    // SDL_SetWindowRelativeMouseMode(mWindow, true);
+    // マウス操作が行えないのでOFF
 
     // openGL コンテキストを作成
     mContext = SDL_GL_CreateContext(mWindow);

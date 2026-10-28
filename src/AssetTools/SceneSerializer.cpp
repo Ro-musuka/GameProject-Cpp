@@ -8,6 +8,8 @@
 
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
+#include "Actor/Enemy.h"
+#include "Actor/DebagCamera.h"
 
 #include "Component/FollowCameraComponent.h"
 #include "Component/CollisionComp/BoxComponent.h"
@@ -228,6 +230,14 @@ Actor *SceneSerializer::CreateActor(const nlohmann::json &actorJSON)
     else if (type == "Player")
     {
         actor = new Player(mGame);
+    }
+    else if (type == "Enemy")
+    {
+        actor = new Enemy(mGame);
+    }
+    else if (type == "DebagCamera")
+    {
+        actor = new DebagCamera(mGame);
     }
     else
     {

@@ -18,7 +18,27 @@
                 }
             ],
             "transform": {
-                "position": [0.0, 20.8, 0.0],
+                "position": [0.0, 11.8, 0.0],
+                "rotation": [1.0, 0.0, 0.0, 0.0],
+                "scale": [1.0, 1.0, 1.0]
+            }
+        },
+        {
+            "type": "Enemy",
+            "components": [
+                {
+                    "type": "AnimMeshComponent",
+                    "model": "anim"
+                },
+                {
+                    "type": "PlayerBoxComponent",
+                    "collisionType": "Dynamic",
+                    "max": [6.0, 9.2, 2.0],
+                    "min": [-6.0, -10.8, -2.0]
+                }
+            ],
+            "transform": {
+                "position": [10.0, 11.8, 0.0],
                 "rotation": [1.0, 0.0, 0.0, 0.0],
                 "scale": [1.0, 1.0, 1.0]
             }
@@ -41,6 +61,15 @@
                 "position": [0.0, 0.0, 0.0],
                 "rotation": [1.0, 0.0, 0.0, 0.0],
                 "scale": [10.0, 0.5, 17.0]
+            }
+        },
+        {
+            "type": "DebagCamera",
+            "components": [],
+            "transform": {
+                "position": [0.0, 10.0, -20.0],
+                "rotation": [1.0, 0.0, 0.0, 0.0],
+                "scale": [1.0, 1.0, 1.0]
             }
         }
     ]
