@@ -13,9 +13,12 @@ class Enemy : public Actor
 public:
     enum EnemyState
     {
-        EChasing,
-        EFighting,
-        EIdle
+        EIdle,
+        EChase,
+        EAttack,
+        ERecover,
+        EHit,
+        EDead
     };
 
     Enemy(Game *game);
@@ -24,16 +27,19 @@ public:
 
     void UpdateActor(float deltaTime) override;
 
-    void ChasePlayer(float deltaTime);
-    void RotateTowardPlayer();
-    void ObstacleDetection();
-
     // ゲッター/セッター
     const char *GetTypeName() const override { return "Enemy"; }
 
     void SetAnimMeshComp(AnimMeshComponent *animMeshComp) { mAnimMeshComp = animMeshComp; }
 
 private:
+    void UpdateIdle(float deltaTime);
+    void UpdateChase(float deltaTime);
+    void UpdateAttack(float deltaTime);
+    void UpdateRecover(float deltaTime);
+    void RotateTowardPlayer(float deltaTime);
+    void ChangeState(EnemyState newState);
+
     AnimMeshComponent *mAnimMeshComp;
     EnemyState mEnemyState;
 
@@ -41,7 +47,8 @@ private:
     float mRotateTimer;
     glm::quat mTargetRotation;
 
+    float mStateTimer;
+
     glm::vec3 mVelocity;
-    const float gravityUp;
     const float gravityDown;
 };

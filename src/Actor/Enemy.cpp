@@ -13,7 +13,7 @@ Enemy::Enemy(Game *game)
       mEnemyState(EIdle),
       mIsRotating(false),
       mRotateTimer(0.0f),
-      gravityUp(-13.0f),
+      mStateTimer(0.0f),
       gravityDown(-10.0f)
 {
 }
@@ -21,28 +21,94 @@ Enemy::Enemy(Game *game)
 void Enemy::Initialize()
 {
     mAnimMeshComp = FindComponent<AnimMeshComponent>();
-    mAnimMeshComp->Play("Idle");
-    mAnimMeshComp->SetLoop(true);
+    ChangeState(EnemyState::EIdle);
 
-    mEnemyState = EFighting;
+    // デバック用
+    ChangeState(EnemyState::EChase);
 }
 
 void Enemy::UpdateActor(float deltaTime)
 {
-    mVelocity = Common::ZeroVec3;
+    mVelocity.x = mVelocity.z = 0.0f;
+    mStateTimer += deltaTime;
 
-    if (mEnemyState == EChasing)
+    RotateTowardPlayer(deltaTime);
+    switch (mEnemyState)
     {
-        ChasePlayer(deltaTime);
-    }
-    else if (mEnemyState == EFighting)
-    {
-        RotateTowardPlayer();
-    }
-    else if (mEnemyState == EIdle)
-    {
+    case EnemyState::EIdle:
+        UpdateIdle(deltaTime);
+        break;
+
+    case EnemyState::EChase:
+        UpdateChase(deltaTime);
+        break;
+
+    case EnemyState::EAttack:
+        UpdateAttack(deltaTime);
+        break;
+
+    case EnemyState::ERecover:
+        UpdateRecover(deltaTime);
+        break;
+
+    case EnemyState::EHit:
+        // 被弾処理
+        break;
+
+    case EnemyState::EDead:
+        // 死亡処理
+        break;
     }
 
+    // 移動
+    mVelocity.y += gravityDown * deltaTime;
+    if (mVelocity.y <= -15.0f)
+    {
+        mVelocity.y = -15.0f;
+    }
+
+    glm::vec3 pos = GetPosition();
+    pos += mVelocity * deltaTime;
+    SetPosition(pos);
+}
+
+void Enemy::UpdateIdle(float deltaTime)
+{
+}
+
+void Enemy::UpdateChase(float deltaTime)
+{
+    // 敵とプレイヤーの距離を計算
+    glm::vec3 diff = GetGame()->GetPlayer()->GetPosition() - GetPosition();
+    diff.y = 0.0f;
+    // diff <= 10.0f
+    if (glm::length2(diff) <= (100.0f))
+    {
+        ChangeState(EAttack);
+        return;
+    }
+
+    const float chaseSpeed = 10.0f;
+    glm::vec3 forward = glm::normalize(diff);
+    mVelocity += forward * chaseSpeed;
+}
+
+void Enemy::UpdateAttack(float deltaTime)
+{
+    if (!mAnimMeshComp->IsPlaying())
+    {
+        ChangeState(EnemyState::EIdle);
+    }
+
+    return;
+}
+
+void Enemy::UpdateRecover(float deltaTime)
+{
+}
+
+void Enemy::RotateTowardPlayer(float deltaTime)
+{
     // 回転
     if (mIsRotating)
     {
@@ -59,39 +125,10 @@ void Enemy::UpdateActor(float deltaTime)
             mIsRotating = false;
             mRotateTimer = 0.0f;
         }
+
+        return;
     }
 
-    // 移動
-    if (mVelocity.y >= 0.0f)
-    {
-        mVelocity.y += gravityUp * deltaTime;
-    }
-    else
-    {
-        mVelocity.y += gravityDown * deltaTime;
-    }
-
-    if (mVelocity.y <= -15.0f)
-    {
-        mVelocity.y = -15.0f;
-    }
-    glm::vec3 pos = GetPosition();
-    pos += mVelocity * deltaTime;
-    SetPosition(pos);
-}
-
-void Enemy::ChasePlayer(float deltaTime)
-{
-    // 敵とプレイヤーの距離を計算
-    glm::vec3 diff = GetGame()->GetPlayer()->GetPosition() - GetPosition();
-    diff.y = 0.0f;
-    glm::vec3 forward = glm::normalize(diff);
-
-    mVelocity += forward * 10.0f;
-}
-
-void Enemy::RotateTowardPlayer()
-{
     // 敵とプレイヤーの距離を計算
     glm::vec3 diff = GetGame()->GetPlayer()->GetPosition() - GetPosition();
     diff.y = 0.0f;
@@ -100,28 +137,66 @@ void Enemy::RotateTowardPlayer()
         return;
     }
 
-    // プレイヤーへの方向
-    glm::vec3 forward = glm::normalize(diff);
     // 現在の向いている方向
     glm::vec3 currentForward = GetForward();
     currentForward.y = 0.0f;
 
     // 二つの方向が平行なら回転しない
     // 平行なベクトル同士の内積は, 1.0
-    float dot = glm::dot(currentForward, forward);
+    float dot = glm::dot(currentForward, diff);
     if (Common::NearZero(1 - dot))
     {
         return;
     }
 
     // 目標までのYaw角
-    float yaw = glm::atan(forward.x, forward.z);
+    float yaw = glm::atan(diff.x, diff.z);
 
     mIsRotating = true;
     mRotateTimer = 0.0f;
     mTargetRotation = glm::angleAxis(yaw, Common::UnitY);
 }
 
-void Enemy::ObstacleDetection()
+void Enemy::ChangeState(EnemyState newState)
 {
+    if (mEnemyState == newState)
+    {
+        return;
+    }
+
+    mEnemyState = newState;
+    mStateTimer = 0.0f;
+
+    switch (mEnemyState)
+    {
+    case EnemyState::EIdle:
+        mAnimMeshComp->Play("Idle");
+        mAnimMeshComp->SetLoop(true);
+        break;
+
+    case EnemyState::EChase:
+        mAnimMeshComp->Play("ERunning");
+        mAnimMeshComp->SetLoop(true);
+        break;
+
+    case EnemyState::EAttack:
+        mAnimMeshComp->Play("Punching");
+        mAnimMeshComp->SetLoop(false);
+        break;
+
+    case EnemyState::ERecover:
+        mAnimMeshComp->Play("Idle");
+        mAnimMeshComp->SetLoop(true);
+        break;
+
+    case EnemyState::EHit:
+        mAnimMeshComp->Play("Hit");
+        mAnimMeshComp->SetLoop(false);
+        break;
+
+    case EnemyState::EDead:
+        mAnimMeshComp->Play("Death");
+        mAnimMeshComp->SetLoop(false);
+        break;
+    }
 }
