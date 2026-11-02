@@ -71,8 +71,8 @@ public:
     }
 
     // 見いている方向
-    glm::vec3 GetForward() const { return (Common::UnitZ * mRotation); }
-    glm::vec3 GetRight() const { return (Common::UnitX * mRotation); }
+    glm::vec3 GetForward() const { return (mRotation * Common::UnitZ); }
+    glm::vec3 GetRight() const { return (mRotation * Common::UnitX); }
 
     State GetState() const { return mState; }
     void SetState(State state) { mState = state; }

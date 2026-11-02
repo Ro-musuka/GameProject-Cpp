@@ -39,16 +39,21 @@ private:
     void UpdateRecover(float deltaTime);
     void RotateTowardPlayer(float deltaTime);
     void ChangeState(EnemyState newState);
+    void CheckAttackHit();
 
+    // アニメーション
     AnimMeshComponent *mAnimMeshComp;
+    // 敵の状態
     EnemyState mEnemyState;
-
-    bool mIsRotating;
-    float mRotateTimer;
-    glm::quat mTargetRotation;
-
     float mStateTimer;
 
+    // 回転
+    bool mIsRotating;
+    float mRotateTimer;
+    glm::quat mStartRotation;
+    glm::quat mTargetRotation;
+
+    // 速度と重力
     glm::vec3 mVelocity;
     const float gravityDown;
 };

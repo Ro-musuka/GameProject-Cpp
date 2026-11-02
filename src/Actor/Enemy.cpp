@@ -21,10 +21,8 @@ Enemy::Enemy(Game *game)
 void Enemy::Initialize()
 {
     mAnimMeshComp = FindComponent<AnimMeshComponent>();
-    ChangeState(EnemyState::EIdle);
-
-    // デバック用
-    ChangeState(EnemyState::EChase);
+    // 発見処理を作ったらEIdelに変更
+    ChangeState(EnemyState::ERecover);
 }
 
 void Enemy::UpdateActor(float deltaTime)
@@ -32,7 +30,6 @@ void Enemy::UpdateActor(float deltaTime)
     mVelocity.x = mVelocity.z = 0.0f;
     mStateTimer += deltaTime;
 
-    RotateTowardPlayer(deltaTime);
     switch (mEnemyState)
     {
     case EnemyState::EIdle:
@@ -101,6 +98,8 @@ void Enemy::UpdateChase(float deltaTime)
 
 void Enemy::UpdateAttack(float deltaTime)
 {
+    RotateTowardPlayer(deltaTime);
+
     if (!mAnimMeshComp->IsPlaying())
     {
         ChangeState(EnemyState::ERecover);
@@ -111,24 +110,20 @@ void Enemy::UpdateAttack(float deltaTime)
 
 void Enemy::UpdateRecover(float deltaTime)
 {
-    mStateTimer += deltaTime;
+    // 待機中はプレイヤー方向に回転しつつ、1.8秒待機
+    RotateTowardPlayer(deltaTime);
     if (mStateTimer <= 1.8f)
     {
         return;
     }
 
     glm::vec3 diff = GetGame()->GetPlayer()->GetPosition() - GetPosition();
-    // 20.0f圏内なら、回転
+    // 20.0f圏内なら、攻撃
     if (glm::length2(diff) <= (20.0f * 20.0f))
     {
-        RotateTowardPlayer(deltaTime);
-        // 相手方向を向いたら、攻撃
-        if (!mIsRotating)
-        {
-            ChangeState(EnemyState::EAttack);
-        }
+        ChangeState(EnemyState::EAttack);
     }
-    // 離れていたて、かつ見失ってないならチェイス
+    // 離れていて、かつ見失ってないならチェイス
     else if (glm::length2(diff) <= (100.0f * 100.0f))
     {
         ChangeState(EnemyState::EChase);
@@ -146,11 +141,11 @@ void Enemy::RotateTowardPlayer(float deltaTime)
     if (mIsRotating)
     {
         mRotateTimer += deltaTime;
-        // 回転に2秒かかる場合
-        float t = glm::clamp(mRotateTimer / 2.0f, 0.0f, 1.0f);
+        // 回転に1秒かかる場合
+        float t = glm::clamp(mRotateTimer / 1.0f, 0.0f, 1.0f);
 
         // 回転を補間
-        glm::quat rotate = glm::slerp(GetRotation(), mTargetRotation, t);
+        glm::quat rotate = glm::slerp(mStartRotation, mTargetRotation, t);
         SetRotation(rotate);
 
         if (t == 1.0f)
@@ -169,15 +164,17 @@ void Enemy::RotateTowardPlayer(float deltaTime)
     {
         return;
     }
+    glm::vec3 forward = glm::normalize(diff);
 
     // 現在の向いている方向
     glm::vec3 currentForward = GetForward();
     currentForward.y = 0.0f;
+    currentForward = glm::normalize(currentForward);
 
     // 二つの方向が平行なら回転しない
     // 平行なベクトル同士の内積は, 1.0
-    float dot = glm::dot(currentForward, diff);
-    if (Common::NearZero(1 - dot))
+    float dot = glm::dot(currentForward, forward);
+    if (dot >= 0.9f)
     {
         return;
     }
@@ -187,6 +184,7 @@ void Enemy::RotateTowardPlayer(float deltaTime)
 
     mIsRotating = true;
     mRotateTimer = 0.0f;
+    mStartRotation = GetRotation();
     mTargetRotation = glm::angleAxis(yaw, Common::UnitY);
 }
 
@@ -208,7 +206,7 @@ void Enemy::ChangeState(EnemyState newState)
         break;
 
     case EnemyState::EChase:
-        mAnimMeshComp->Play("ERunning");
+        mAnimMeshComp->Play("Running");
         mAnimMeshComp->SetLoop(true);
         break;
 
