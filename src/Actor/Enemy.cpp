@@ -84,7 +84,13 @@ void Enemy::UpdateChase(float deltaTime)
     // diff <= 10.0f
     if (glm::length2(diff) <= (100.0f))
     {
-        ChangeState(EAttack);
+        ChangeState(ERecover);
+        return;
+    }
+
+    if (glm::length2(diff) >= (100.0f * 100.0f))
+    {
+        ChangeState(EIdle);
         return;
     }
 
@@ -97,7 +103,7 @@ void Enemy::UpdateAttack(float deltaTime)
 {
     if (!mAnimMeshComp->IsPlaying())
     {
-        ChangeState(EnemyState::EIdle);
+        ChangeState(EnemyState::ERecover);
     }
 
     return;
@@ -105,6 +111,33 @@ void Enemy::UpdateAttack(float deltaTime)
 
 void Enemy::UpdateRecover(float deltaTime)
 {
+    mStateTimer += deltaTime;
+    if (mStateTimer <= 1.8f)
+    {
+        return;
+    }
+
+    glm::vec3 diff = GetGame()->GetPlayer()->GetPosition() - GetPosition();
+    // 20.0f圏内なら、回転
+    if (glm::length2(diff) <= (20.0f * 20.0f))
+    {
+        RotateTowardPlayer(deltaTime);
+        // 相手方向を向いたら、攻撃
+        if (!mIsRotating)
+        {
+            ChangeState(EnemyState::EAttack);
+        }
+    }
+    // 離れていたて、かつ見失ってないならチェイス
+    else if (glm::length2(diff) <= (100.0f * 100.0f))
+    {
+        ChangeState(EnemyState::EChase);
+    }
+    else
+    {
+        ChangeState(EIdle);
+        return;
+    }
 }
 
 void Enemy::RotateTowardPlayer(float deltaTime)
