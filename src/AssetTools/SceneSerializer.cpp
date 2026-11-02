@@ -11,13 +11,14 @@
 #include "Actor/Enemy.h"
 #include "Actor/DebagCamera.h"
 
+#include "Component/MoveComponent.h"
 #include "Component/FollowCameraComponent.h"
 #include "Component/CollisionComp/BoxComponent.h"
 #include "Component/CollisionComp/PlayerBoxComponent.h"
 #include "Component/MeshComp/MeshComponent.h"
 #include "Component/MeshComp/AnimMeshComponent.h"
 
-#include "Collision/Collision.h"
+#include "Phys/Collision.h"
 
 #include "Graphics/Mesh_Vertex/Mesh.h"
 #include "Graphics/Mesh_Vertex/AnimMesh.h"
@@ -250,7 +251,11 @@ Actor *SceneSerializer::CreateActor(const nlohmann::json &actorJSON)
 bool SceneSerializer::AttachComp(Actor *actor, const nlohmann::json &compJSON)
 {
     std::string componentType = compJSON.at("type").get<std::string>();
-    if (componentType == "BoxComponent")
+    if (componentType == "MoveComponent")
+    {
+        MoveComponent *move = new MoveComponent(actor);
+    }
+    else if (componentType == "BoxComponent")
     {
         BoxComponent *box = new BoxComponent(actor);
         if (!SettingBoxComp(box, compJSON))
