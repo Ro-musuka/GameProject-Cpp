@@ -1,12 +1,17 @@
 {
     "actors": [
         {
+            "type": "Player",
             "components": [
                 {
-                    "model": "anim",
-                    "type": "PlayerBoxComponent"
+                    "type": "MoveComponent"
                 },
                 {
+                    "type": "PlayerBoxComponent",
+                    "model": "anim"
+                },
+                {
+                    "type": "PlayerBoxComponent",
                     "collisionType": "Dynamic",
                     "max": [
                         6.0,
@@ -17,8 +22,7 @@
                         -6.0,
                         -10.800000190734863,
                         -2.0
-                    ],
-                    "type": "PlayerBoxComponent"
+                    ]
                 },
                 {
                     "type": "FollowCameraComponent"
@@ -27,7 +31,7 @@
             "transform": {
                 "position": [
                     0.0,
-                    11.045000076293945,
+                    11.933089256286621,
                     0.0
                 ],
                 "rotation": [
@@ -41,16 +45,61 @@
                     1.0,
                     1.0
                 ]
-            },
-            "type": "Player"
+            }
         },
         {
+            "type": "Enemy",
             "components": [
                 {
-                    "model": "box",
-                    "type": "PlayerBoxComponent"
+                    "type": "MoveComponent"
                 },
                 {
+                    "type": "PlayerBoxComponent",
+                    "model": "anim"
+                },
+                {
+                    "type": "PlayerBoxComponent",
+                    "collisionType": "Dynamic",
+                    "max": [
+                        6.0,
+                        9.199999809265137,
+                        2.0
+                    ],
+                    "min": [
+                        -6.0,
+                        -10.800000190734863,
+                        -2.0
+                    ]
+                }
+            ],
+            "transform": {
+                "position": [
+                    10.0,
+                    11.800000190734863,
+                    0.0
+                ],
+                "rotation": [
+                    0.7071067690849304,
+                    0.0,
+                    -0.7071067690849304,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "Actor",
+            "components": [
+                {
+                    "type": "PlayerBoxComponent",
+                    "model": "box"
+                },
+                {
+                    "type": "BoxComponent",
                     "collisionType": "Static",
                     "max": [
                         1.0,
@@ -61,8 +110,7 @@
                         -1.0,
                         -1.0,
                         -1.0
-                    ],
-                    "type": "BoxComponent"
+                    ]
                 }
             ],
             "transform": {
@@ -82,8 +130,28 @@
                     0.5,
                     17.0
                 ]
-            },
-            "type": "Actor"
+            }
+        },
+        {
+            "type": "DebagCamera",
+            "transform": {
+                "position": [
+                    0.0,
+                    10.0,
+                    -20.0
+                ],
+                "rotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
         }
     ]
 }

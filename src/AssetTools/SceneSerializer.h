@@ -24,7 +24,7 @@ public:
 
 private:
     // コンポーネントのデータ書き込み
-    bool SaveComponents_JSON(nlohmann::json &compJSON, Component *comp);
+    bool SaveComponents_JSON(nlohmann::ordered_json &compJSON, Component *comp);
 
     // 3Dモデルのデータ読み込み
     bool LoadModelAsset(const std::string &path, const std::string &modelName);

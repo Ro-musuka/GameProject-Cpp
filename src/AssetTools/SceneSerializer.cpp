@@ -42,13 +42,13 @@ bool SceneSerializer::SaveScene_JSON(const std::string &path)
     }
 
     // 保存するJSONデータ
-    nlohmann::json root;
+    nlohmann::ordered_json root;
     // actor配列データを作成
-    root["actors"] = nlohmann::json::array();
+    root["actors"] = nlohmann::ordered_json::array();
 
     for (Actor *actor : mGame->GetActors())
     {
-        nlohmann::json actorJSON;
+        nlohmann::ordered_json actorJSON;
 
         // Actorの型名を保存
         actorJSON["type"] = actor->GetTypeName();
@@ -56,13 +56,13 @@ bool SceneSerializer::SaveScene_JSON(const std::string &path)
         // 各データをJSONのオブジェクトにして、componentJSON配列に追加していく
         for (Component *comp : actor->GetComponents())
         {
-            nlohmann::json compJSON = nlohmann::json::object();
+            nlohmann::ordered_json compJSON = nlohmann::ordered_json::object();
             SaveComponents_JSON(compJSON, comp);
             actorJSON["components"].push_back(compJSON);
         }
 
         // transformデータを保存
-        nlohmann::json transform = nlohmann::json::object();
+        nlohmann::ordered_json transform = nlohmann::ordered_json::object();
         transform["position"] = ToJSON(actor->GetPosition());
         transform["rotation"] = ToJSON(actor->GetRotation());
         transform["scale"] = ToJSON(actor->GetScale());
@@ -142,7 +142,7 @@ bool SceneSerializer::LoadScene_JSON(const std::string &path)
     return true;
 }
 
-bool SceneSerializer::SaveComponents_JSON(nlohmann::json &compJSON, Component *comp)
+bool SceneSerializer::SaveComponents_JSON(nlohmann::ordered_json &compJSON, Component *comp)
 {
     // それぞれのcompの型をキャストできるかで確かめる
     // 派生クラスは元クラスでキャストできるので注意
