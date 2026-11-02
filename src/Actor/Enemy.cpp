@@ -57,7 +57,10 @@ void Enemy::UpdateActor(float deltaTime)
         break;
 
     case EnemyState::EDead:
-        // 死亡処理
+        if (!mAnimMeshComp->IsPlaying())
+        {
+            SetState(ActorState::EDead);
+        }
         break;
     }
 

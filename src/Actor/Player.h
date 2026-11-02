@@ -14,6 +14,7 @@ public:
         ERunning,
         EPunching,
         EJumping,
+        EDead,
         EIdle
     };
 
@@ -23,6 +24,8 @@ public:
 
     void UpdateActor(float deltaTime) override;
     void ActorInput(const bool *keystate) override;
+
+    void TakeDamage(float damage);
 
     // ゲッター/セッター
     const char *GetTypeName() const override { return "Player"; }
@@ -35,6 +38,8 @@ public:
 private:
     AnimMeshComponent *mAnimMeshComp;
     PlayerState mPlayerState;
+
+    float mHP;
 
     glm::vec3 mVelocity;
     const float gravityUp;

@@ -11,7 +11,8 @@ Player::Player(Game *game)
     : Actor(game),
       mVelocity(Common::ZeroVec3),
       gravityUp(-13.0f),
-      gravityDown(-10.0f)
+      gravityDown(-10.0f),
+      mHP(100)
 {
     GetGame()->SetPlayer(this);
 }
@@ -36,13 +37,18 @@ void Player::UpdateActor(float deltaTime)
     {
         mVelocity.y = -15.0f;
     }
-    glm::vec3 pos = GetPosition();
-    pos += mVelocity * deltaTime;
-    SetPosition(pos);
+    // glm::vec3 pos = GetPosition();
+    // pos += mVelocity * deltaTime;
+    // SetPosition(pos);
 }
 
 void Player::ActorInput(const bool *keystate)
 {
+    if (mPlayerState == PlayerState::EDead && !mAnimMeshComp->IsPlaying())
+    {
+        SetState(ActorState::EDead);
+    }
+
     mVelocity.x = mVelocity.z = 0.0f;
 
     if (keystate[SDL_SCANCODE_W])
@@ -63,19 +69,19 @@ void Player::ActorInput(const bool *keystate)
         mVelocity += GetRight() * 10.0f;
     }
 
-    if (keystate[SDL_SCANCODE_SPACE] && mPlayerState != EJumping)
+    if (keystate[SDL_SCANCODE_SPACE] && mPlayerState != PlayerState::EJumping)
     {
         mVelocity.y = 15.0f;
         mAnimMeshComp->Play("Jumping");
         mAnimMeshComp->SetLoop(false);
-        mPlayerState = EJumping;
+        mPlayerState = PlayerState::EJumping;
     }
 
-    if (keystate[SDL_SCANCODE_P] && mPlayerState != EPunching)
+    if (keystate[SDL_SCANCODE_P] && mPlayerState != PlayerState::EPunching)
     {
         mAnimMeshComp->Play("Punching");
         mAnimMeshComp->SetLoop(false);
-        mPlayerState = EPunching;
+        mPlayerState = PlayerState::EPunching;
     }
 
     if (mAnimMeshComp->IsPlaying() && !mAnimMeshComp->IsLoop())
@@ -85,17 +91,41 @@ void Player::ActorInput(const bool *keystate)
 
     if (Common::NearZero(mVelocity.x) && Common::NearZero(mVelocity.z))
     {
-        if (mPlayerState != EIdle)
+        if (mPlayerState != PlayerState::EIdle)
         {
             mAnimMeshComp->Play("Idle");
             mAnimMeshComp->SetLoop(true);
-            mPlayerState = EIdle;
+            mPlayerState = PlayerState::EIdle;
         }
     }
-    else if (mPlayerState != EWalking)
+    else if (mPlayerState != PlayerState::EWalking)
     {
         mAnimMeshComp->Play("Walking");
         mAnimMeshComp->SetLoop(true);
-        mPlayerState = EWalking;
+        mPlayerState = PlayerState::EWalking;
+    }
+}
+
+void Player::TakeDamage(float damage)
+{
+    if (mHP <= 0.0f)
+    {
+        return;
+    }
+
+    if (mHP <= damage)
+    {
+        mHP = 0;
+    }
+    else
+    {
+        mHP -= damage;
+    }
+
+    if (mHP <= 0.0f)
+    {
+        mPlayerState = PlayerState::EDead;
+        mAnimMeshComp->Play("Death");
+        mAnimMeshComp->SetLoop(false);
     }
 }

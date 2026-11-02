@@ -16,7 +16,7 @@ class Actor
     friend class SceneSerializer;
 
 public:
-    enum State
+    enum ActorState
     {
         EActive,
         EPaused,
@@ -74,8 +74,8 @@ public:
     glm::vec3 GetForward() const { return (mRotation * Common::UnitZ); }
     glm::vec3 GetRight() const { return (mRotation * Common::UnitX); }
 
-    State GetState() const { return mState; }
-    void SetState(State state) { mState = state; }
+    ActorState GetState() const { return mState; }
+    void SetState(ActorState state) { mState = state; }
 
     Game *GetGame() const { return mGame; }
 
@@ -106,7 +106,7 @@ private:
     glm::quat mRotation;
     glm::vec3 mScale;
 
-    State mState;
+    ActorState mState;
 
     // 座標変化があった場合にtrue
     // ワールド変換の再計算をすべきか？
