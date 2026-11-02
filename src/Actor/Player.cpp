@@ -6,13 +6,12 @@
 #include "Core/Common.h"
 
 #include "Component/MeshComp/AnimMeshComponent.h"
+#include "Component/MoveComponent.h"
 
 Player::Player(Game *game)
     : Actor(game),
-      mVelocity(Common::ZeroVec3),
-      gravityUp(-13.0f),
-      gravityDown(-10.0f),
-      mHP(100)
+      mHP(100),
+      Up(5.0f)
 {
     GetGame()->SetPlayer(this);
 }
@@ -20,26 +19,22 @@ Player::Player(Game *game)
 void Player::Initialize()
 {
     mAnimMeshComp = FindComponent<AnimMeshComponent>();
+    mMoveComponent = FindComponent<MoveComponent>();
+    mMoveComponent->SetSpeed(10.0f);
 }
 
 void Player::UpdateActor(float deltaTime)
 {
-    if (mVelocity.y >= 0.0f)
+    // ジャンプ中は、落下を遅くする
+    glm::vec3 vel = mMoveComponent->GetVelocity();
+    if (vel.y >= 0.0f)
     {
-        mVelocity.y += gravityUp * deltaTime;
-    }
-    else
-    {
-        mVelocity.y += gravityDown * deltaTime;
+        vel.y += Up * deltaTime;
     }
 
-    if (mVelocity.y <= -15.0f)
-    {
-        mVelocity.y = -15.0f;
-    }
-    // glm::vec3 pos = GetPosition();
-    // pos += mVelocity * deltaTime;
-    // SetPosition(pos);
+    glm::vec3 pos = GetPosition();
+    pos += vel * deltaTime;
+    SetPosition(pos);
 }
 
 void Player::ActorInput(const bool *keystate)
@@ -49,29 +44,31 @@ void Player::ActorInput(const bool *keystate)
         SetState(ActorState::EDead);
     }
 
-    mVelocity.x = mVelocity.z = 0.0f;
+    glm::vec3 vel = mMoveComponent->GetVelocity();
+    vel.x = vel.y = 0.0f;
+    float speed = mMoveComponent->GetSpeed();
 
     if (keystate[SDL_SCANCODE_W])
     {
-        mVelocity += GetForward() * 10.0f;
+        vel += GetForward() * speed;
     }
     if (keystate[SDL_SCANCODE_S])
     {
-        mVelocity -= GetForward() * 10.0f;
+        vel -= GetForward() * speed;
     }
 
     if (keystate[SDL_SCANCODE_A])
     {
-        mVelocity -= GetRight() * 10.0f;
+        vel -= GetRight() * speed;
     }
     if (keystate[SDL_SCANCODE_D])
     {
-        mVelocity += GetRight() * 10.0f;
+        vel += GetRight() * speed;
     }
 
     if (keystate[SDL_SCANCODE_SPACE] && mPlayerState != PlayerState::EJumping)
     {
-        mVelocity.y = 15.0f;
+        vel.y = 15.0f;
         mAnimMeshComp->Play("Jumping");
         mAnimMeshComp->SetLoop(false);
         mPlayerState = PlayerState::EJumping;
@@ -84,12 +81,13 @@ void Player::ActorInput(const bool *keystate)
         mPlayerState = PlayerState::EPunching;
     }
 
+    // ループのないアニメを再生しているなら、終了
     if (mAnimMeshComp->IsPlaying() && !mAnimMeshComp->IsLoop())
     {
         return;
     }
 
-    if (Common::NearZero(mVelocity.x) && Common::NearZero(mVelocity.z))
+    if (Common::NearZero(vel.x) && Common::NearZero(vel.z))
     {
         if (mPlayerState != PlayerState::EIdle)
         {

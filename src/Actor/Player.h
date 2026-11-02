@@ -3,6 +3,7 @@
 #include "Actor/Actor.h"
 
 class AnimMeshComponent;
+class MoveComponent;
 class Game;
 
 class Player : public Actor
@@ -37,11 +38,10 @@ public:
 
 private:
     AnimMeshComponent *mAnimMeshComp;
+    MoveComponent *mMoveComponent;
     PlayerState mPlayerState;
 
     float mHP;
 
-    glm::vec3 mVelocity;
-    const float gravityUp;
-    const float gravityDown;
+    const float Up;
 };

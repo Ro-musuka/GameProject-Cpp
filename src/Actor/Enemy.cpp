@@ -4,8 +4,10 @@
 
 #include "Core/Game.h"
 
-#include "Component/MeshComp/AnimMeshComponent.h"
 #include "Actor/Player.h"
+
+#include "Component/MeshComp/AnimMeshComponent.h"
+#include "Component/MoveComponent.h"
 
 Enemy::Enemy(Game *game)
     : Actor(game),
@@ -17,21 +19,25 @@ Enemy::Enemy(Game *game)
       mAttackDamage(10.0f),
       mAttackRange(5.0f),
       mAttackRadius(10.0f),
-      mIsAttackActive(false),
-      gravityDown(-10.0f)
+      mIsAttackActive(false)
 {
 }
 
 void Enemy::Initialize()
 {
     mAnimMeshComp = FindComponent<AnimMeshComponent>();
+    mMoveComponent = FindComponent<MoveComponent>();
+    mMoveComponent->SetSpeed(10.0f);
+
     // 発見処理を作ったらEIdelに変更
     ChangeState(EnemyState::ERecover);
 }
 
 void Enemy::UpdateActor(float deltaTime)
 {
-    mVelocity.x = mVelocity.z = 0.0f;
+    glm::vec3 vel = mMoveComponent->GetVelocity();
+    vel.x = vel.z = 0.0f;
+    mMoveComponent->SetVelocity(vel);
     mStateTimer += deltaTime;
 
     switch (mEnemyState)
@@ -65,14 +71,8 @@ void Enemy::UpdateActor(float deltaTime)
     }
 
     // 移動
-    mVelocity.y += gravityDown * deltaTime;
-    if (mVelocity.y <= -15.0f)
-    {
-        mVelocity.y = -15.0f;
-    }
-
     glm::vec3 pos = GetPosition();
-    pos += mVelocity * deltaTime;
+    pos += mMoveComponent->GetVelocity() * deltaTime;
     SetPosition(pos);
 }
 
@@ -98,9 +98,8 @@ void Enemy::UpdateChase(float deltaTime)
         return;
     }
 
-    const float chaseSpeed = 10.0f;
     glm::vec3 forward = glm::normalize(diff);
-    mVelocity += forward * chaseSpeed;
+    mMoveComponent->AddVelocity(forward * mMoveComponent->GetSpeed());
 }
 
 void Enemy::UpdateAttack(float deltaTime)

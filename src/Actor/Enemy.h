@@ -7,6 +7,7 @@
 
 class Game;
 class AnimMeshComponent;
+class MoveComponent;
 
 class Enemy : public Actor
 {
@@ -43,6 +44,8 @@ private:
 
     // アニメーション
     AnimMeshComponent *mAnimMeshComp;
+    // 速度
+    MoveComponent *mMoveComponent;
     // 敵の状態
     EnemyState mEnemyState;
     float mStateTimer;
@@ -61,8 +64,4 @@ private:
     // 攻撃判定の状態
     bool mIsAttackActive;
     bool mHasDamagedPlayer;
-
-    // 速度と重力
-    glm::vec3 mVelocity;
-    const float gravityDown;
 };
