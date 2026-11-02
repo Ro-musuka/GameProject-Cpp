@@ -11,9 +11,13 @@ Enemy::Enemy(Game *game)
     : Actor(game),
       mAnimMeshComp(nullptr),
       mEnemyState(EIdle),
+      mStateTimer(0.0f),
       mIsRotating(false),
       mRotateTimer(0.0f),
-      mStateTimer(0.0f),
+      mAttackDamage(10.0f),
+      mAttackRange(5.0f),
+      mAttackRadius(10.0f),
+      mIsAttackActive(false),
       gravityDown(-10.0f)
 {
 }
@@ -100,12 +104,28 @@ void Enemy::UpdateAttack(float deltaTime)
 {
     RotateTowardPlayer(deltaTime);
 
-    if (!mAnimMeshComp->IsPlaying())
+    // 攻撃判定の有効時間
+    const float attackStart = 0.3f;
+    const float attackEnd = 0.6f;
+
+    if (mStateTimer >= attackStart &&
+        mStateTimer <= attackEnd)
     {
-        ChangeState(EnemyState::ERecover);
+        mIsAttackActive = true;
+        CheckAttackHit();
+    }
+    else
+    {
+        mIsAttackActive = false;
+        mHasDamagedPlayer = false;
     }
 
-    return;
+    // アニメーション終了
+    if (!mAnimMeshComp->IsPlaying())
+    {
+        mIsAttackActive = false;
+        ChangeState(EnemyState::ERecover);
+    }
 }
 
 void Enemy::UpdateRecover(float deltaTime)
@@ -229,5 +249,30 @@ void Enemy::ChangeState(EnemyState newState)
         mAnimMeshComp->Play("Death");
         mAnimMeshComp->SetLoop(false);
         break;
+    }
+}
+
+void Enemy::CheckAttackHit()
+{
+    if (!mIsAttackActive || mHasDamagedPlayer)
+    {
+        return;
+    }
+    Player *player = GetGame()->GetPlayer();
+
+    // 攻撃判定の中心
+    glm::vec3 attackCenter = GetPosition() + GetForward() * mAttackRange;
+
+    // プレイヤーとの距離
+    glm::vec3 diff = player->GetPosition() - attackCenter;
+    diff.y = 0.0f;
+
+    // 球形の攻撃判定
+    const float hitRadius = mAttackRadius + 0.5f;
+
+    if (glm::length2(diff) <= (hitRadius * hitRadius))
+    {
+        player->TakeDamage(mAttackDamage);
+        mHasDamagedPlayer = true;
     }
 }

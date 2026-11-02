@@ -53,6 +53,15 @@ private:
     glm::quat mStartRotation;
     glm::quat mTargetRotation;
 
+    // 攻撃設定
+    float mAttackDamage;
+    float mAttackRange;
+    float mAttackRadius;
+
+    // 攻撃判定の状態
+    bool mIsAttackActive;
+    bool mHasDamagedPlayer;
+
     // 速度と重力
     glm::vec3 mVelocity;
     const float gravityDown;
