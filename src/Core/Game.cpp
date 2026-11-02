@@ -7,7 +7,7 @@
 #include "Actor/Actor.h"
 #include "Actor/Player.h"
 
-#include "Collision/PhysWorld.h"
+#include "Phys/PhysWorld.h"
 
 #include "Graphics/Renderer.h"
 
@@ -19,7 +19,7 @@
 // createBox()のためだけの、#include
 #include "Component/MeshComp/MeshComponent.h"
 #include "Component/CollisionComp/BoxComponent.h"
-#include "Collision/Collision.h"
+#include "Phys/Collision.h"
 
 Game::Game()
     : mIsRunning(true),

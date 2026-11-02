@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Collision/Collision.h"
+#include "Phys/Collision.h"
 #include "Component/Component.h"
 
 class BoxComponent : public Component

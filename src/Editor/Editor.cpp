@@ -9,10 +9,12 @@
 #include "Core/Game.h"
 #include "Core/Common.h"
 
-#include "Collision/PhysWorld.h"
+#include "Phys/PhysWorld.h"
+
 #include "Graphics/Renderer.h"
 
 #include "Actor/Actor.h"
+
 #include "Component/CollisionComp/BoxComponent.h"
 
 Editor::Editor(Game *game)
@@ -79,7 +81,8 @@ void Editor::Draw()
             BoxComponent *box = boxes[i];
             bool selected = (mSelectedBox == box);
             // 押された場合に実行
-            if (ImGui::Selectable(std::to_string(i).c_str(), selected))
+            std::string s = std::to_string(i) + box->GetOwner()->GetTypeName();
+            if (ImGui::Selectable(s.c_str(), selected))
             {
                 mSelectedBox = box;
                 // 回転は四元数をvec3に戻す処理が重いので、今計算する
@@ -122,7 +125,7 @@ void Editor::Draw()
         }
 
         // 回転
-        if (ImGui::SliderFloat3("Roll Pitch Yaw", &mAngleXYZ.x, 0.0f, 359.9f))
+        if (ImGui::InputFloat3("Roll Pitch Yaw", &mAngleXYZ.x))
         {
             glm::vec3 radians = glm::radians(mAngleXYZ);
 

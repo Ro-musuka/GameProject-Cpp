@@ -4,9 +4,11 @@
 
 #include <SDL3/SDL.h>
 
-#include "Collision/Collision.h"
 #include "Actor/Actor.h"
+
 #include "Component/CollisionComp/BoxComponent.h"
+
+#include "Phys/Collision.h"
 
 PhysWorld::PhysWorld(Game *game)
     : mGame(game)
