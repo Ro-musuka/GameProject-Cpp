@@ -24,7 +24,6 @@ MeshComponent::~MeshComponent()
 void MeshComponent::Draw(Shader &shader)
 {
     // ワールド変換行列計算
-    mOwner->ComputeWorldTransform();
     shader.SetMatrixUniform("uWorldTransform", mOwner->GetWorldTransform());
     mMesh->Draw();
 }

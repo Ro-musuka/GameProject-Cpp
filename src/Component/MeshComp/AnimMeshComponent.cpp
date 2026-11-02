@@ -25,7 +25,6 @@ AnimMeshComponent::~AnimMeshComponent()
 void AnimMeshComponent::Draw(Shader *shader)
 {
     // ワールド変換行列計算
-    mOwner->ComputeWorldTransform();
     shader->SetMatrixUniform("uWorldTransform", mOwner->GetWorldTransform());
     // ボーン行列取得
     shader->SetMatrixArrayUniform("uMatrixPalette", mAnimationPlayer.GetBoneMatrices());
